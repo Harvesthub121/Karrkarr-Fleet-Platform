@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { apiGet, apiPatch } from '@/lib/api-client';
 import { Can } from '@/lib/permissions';
 import { useToast } from '@/components/ui/Toast';
-import { PERMISSIONS } from '@vida/shared';
+import { PERMISSIONS } from '@karrkarr/shared';
 import { cn } from '@/lib/utils';
 import { Modal } from '@/components/ui/Modal';
 
