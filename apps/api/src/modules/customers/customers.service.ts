@@ -4,7 +4,7 @@ import { AuthService } from '../auth/auth.service';
 import { CreateCustomerDto, UpdateCustomerDto } from './dto/customer.dto';
 import { PaginationDto, paginate } from '../../common/dto/pagination.dto';
 import type { AdminJwtPayload } from '../auth/strategies/admin-jwt.strategy';
-import { PERMISSIONS } from '@vida/shared';
+import { PERMISSIONS } from '@karrkarr/shared';
 
 /**
  * Mask NRIC to format "SXXXX567A" — show only the last 3 alphanumeric chars.
@@ -84,9 +84,9 @@ export class CustomersService {
     const existing = await this.prisma.customer.findUnique({ where: { email: dto.email } });
     if (existing) throw new ConflictException('Email already registered');
 
-    // Generate human-readable customer reference VP-C-XXXXX
+    // Generate human-readable customer reference KR-C-XXXXX
     const count = await this.prisma.customer.count();
-    const customerRef = `VP-C-${String(count + 1).padStart(5, '0')}`;
+    const customerRef = `KR-C-${String(count + 1).padStart(5, '0')}`;
 
     return this.prisma.customer.create({
       data: { ...dto, customerRef },
