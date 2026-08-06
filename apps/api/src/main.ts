@@ -8,7 +8,6 @@ import { GlobalExceptionFilter } from './common/filters/global-exception.filter'
 import { MoneySerializerInterceptor } from './common/interceptors/money-serializer.interceptor';
 import { AuditInterceptor } from './common/interceptors/audit.interceptor';
 import { AppLogger } from './common/logger/app.logger';
-import { AuditInterceptor } from './common/interceptors/audit.interceptor';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule, {
@@ -79,9 +78,9 @@ async function bootstrap(): Promise<void> {
   // ---------------------------------------------------------------------------
   if (process.env.NODE_ENV !== 'production') {
     const config = new DocumentBuilder()
-      .setTitle('Vida Partners Fleet API')
+      .setTitle('Karrkarr Fleet API')
       .setDescription(
-        'Fleet leasing management API for Vida Partners Pte Ltd. ' +
+        'Fleet leasing management API for Karrkarr Pte Ltd. ' +
           'Admin and customer portals share this API with separate JWT audiences.',
       )
       .setVersion('1.0')
@@ -121,7 +120,7 @@ async function bootstrap(): Promise<void> {
 
   const port = parseInt(process.env.PORT ?? '3000', 10);
   await app.listen(port);
-  logger.log(`Vida Fleet API listening on port ${port}`, 'Bootstrap');
+  logger.log(`Karrkarr Fleet API listening on port ${port}`, 'Bootstrap');
   logger.log(
     `Swagger docs: http://localhost:${port}/docs`,
     'Bootstrap',
