@@ -1,7 +1,7 @@
 import { SetMetadata } from '@nestjs/common';
-import type { Permission } from '@vida/shared';
+import type { Permission } from '@karrkarr/shared';
 
-export const PERMISSIONS_KEY = 'vida:permissions';
+export const PERMISSIONS_KEY = 'karrkarr:permissions';
 
 /**
  * Declare which RBAC permissions a route requires.
