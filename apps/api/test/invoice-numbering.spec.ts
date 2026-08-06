@@ -7,36 +7,36 @@ import { describe, it, expect } from 'vitest';
 
 describe('invoice number format', () => {
   function fakeInvoiceNo(seq: number, year = 2026): string {
-    return `VP-INV-${year}-${seq.toString().padStart(6, '0')}`;
+    return `KR-INV-${year}-${seq.toString().padStart(6, '0')}`;
   }
 
-  it('starts with VP-INV-', () => {
-    expect(fakeInvoiceNo(1)).toMatch(/^VP-INV-/);
+  it('starts with KR-INV-', () => {
+    expect(fakeInvoiceNo(1)).toMatch(/^KR-INV-/);
   });
 
   it('pads sequence to 6 digits', () => {
-    expect(fakeInvoiceNo(1)).toBe('VP-INV-2026-000001');
-    expect(fakeInvoiceNo(999)).toBe('VP-INV-2026-000999');
-    expect(fakeInvoiceNo(1000000)).toBe('VP-INV-2026-1000000'); // goes over 6 when > 999999
+    expect(fakeInvoiceNo(1)).toBe('KR-INV-2026-000001');
+    expect(fakeInvoiceNo(999)).toBe('KR-INV-2026-000999');
+    expect(fakeInvoiceNo(1000000)).toBe('KR-INV-2026-1000000'); // goes over 6 when > 999999
   });
 
   it('uses 4-digit year', () => {
-    expect(fakeInvoiceNo(1, 2026)).toMatch(/VP-INV-2026-/);
-    expect(fakeInvoiceNo(1, 2030)).toMatch(/VP-INV-2030-/);
+    expect(fakeInvoiceNo(1, 2026)).toMatch(/KR-INV-2026-/);
+    expect(fakeInvoiceNo(1, 2030)).toMatch(/KR-INV-2030-/);
   });
 });
 
 describe('receipt number format', () => {
   function fakeReceiptNo(seq: number, year = 2026): string {
-    return `VP-RCP-${year}-${seq.toString().padStart(6, '0')}`;
+    return `KR-RCP-${year}-${seq.toString().padStart(6, '0')}`;
   }
 
-  it('starts with VP-RCP-', () => {
-    expect(fakeReceiptNo(1)).toMatch(/^VP-RCP-/);
+  it('starts with KR-RCP-', () => {
+    expect(fakeReceiptNo(1)).toMatch(/^KR-RCP-/);
   });
 
   it('pads sequence to 6 digits', () => {
-    expect(fakeReceiptNo(42)).toBe('VP-RCP-2026-000042');
+    expect(fakeReceiptNo(42)).toBe('KR-RCP-2026-000042');
   });
 });
 
