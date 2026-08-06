@@ -75,7 +75,7 @@ export function NavBar({ fullName, customerRef }: NavBarProps) {
       <header className="hidden md:flex sticky top-0 z-30 h-14 items-center border-b border-gray-200 bg-white px-6">
         <div className="flex items-center gap-2 min-w-[160px]">
           {/* Logo / brand */}
-          <span className="text-base font-bold tracking-tight text-teal-600">Vida Partners</span>
+          <span className="text-base font-bold tracking-tight text-teal-600">Karrkarr</span>
           <span className="text-xs text-gray-400 border-l border-gray-200 pl-2">Portal</span>
         </div>
 
