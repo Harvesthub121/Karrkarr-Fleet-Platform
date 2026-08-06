@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { roundHalfUp, applyBps, centsToDecimalString, parseSgdToCents, formatSgd } from '@vida/shared';
+import { roundHalfUp, applyBps, centsToDecimalString, parseSgdToCents, formatSgd } from '@karrkarr/shared';
 
 describe('roundHalfUp', () => {
   it('rounds 0.5 up to 1', () => expect(roundHalfUp(0.5)).toBe(1n));
