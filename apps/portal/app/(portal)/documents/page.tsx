@@ -7,7 +7,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { ApiError } from '@/lib/api-client';
 import type { CustomerDocument } from '@/lib/api';
 
-export const metadata = { title: 'Documents — Vida Partners Portal' };
+export const metadata = { title: 'Documents — Karrkarr Portal' };
 export const dynamic = 'force-dynamic';
 
 function groupDocuments(docs: CustomerDocument[]) {
