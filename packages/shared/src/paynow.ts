@@ -21,7 +21,7 @@
 import { centsToDecimalString, type Cents } from './money';
 
 export interface PayNowQrOptions {
-  /** UEN for a corporate payee (Vida Partners), or mobile "+65XXXXXXXX". */
+  /** UEN for a corporate payee (Karrkarr), or mobile "+65XXXXXXXX". */
   uen: string;
   /** Displayed to the payer in their banking app. Uppercase, <= 25 chars. */
   merchantName: string;
