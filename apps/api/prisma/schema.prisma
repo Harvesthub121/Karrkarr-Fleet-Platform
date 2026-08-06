@@ -1,0 +1,856 @@
+// ============================================================================
+// Vida Partners Pte Ltd — Fleet Leasing Management Platform
+// Prisma schema (PostgreSQL)
+// ============================================================================
+//
+// DESIGN NOTES (read before changing anything in here)
+//
+// 1. MONEY IS ALWAYS BigInt CENTS (SGD). Never Float, never Decimal-as-float.
+//    A field named `*Cents` holds an integer number of cents. 1234 == S$12.34.
+//    Rounding happens once, at the point of accrual, half-up, and is persisted.
+//
+// 2. BALANCES ARE DERIVED, NOT STORED. The single source of truth for every
+//    dollar is `LedgerEntry` — an append-only journal. Invoice.outstandingCents
+//    and RentalAgreement.depositBalanceCents exist ONLY as denormalised caches
+//    maintained inside the same transaction that writes the ledger entry. If
+//    they ever disagree with the ledger, the ledger wins and the cache is
+//    rebuilt (see `pnpm --filter @vida/api ledger:reconcile`).
+//
+// 3. VIDA PARTNERS IS NOT GST-REGISTERED. There are deliberately no tax lines.
+//    `PolicySetting` carries a `taxRateBps` key defaulted to 0 and unused, so
+//    registration later is a settings change plus an invoice-template change,
+//    not a schema migration.
+//
+// 4. DEPOSIT REFUND / DISBURSEMENT IS OUT OF SCOPE. Deposits are received,
+//    tracked, and drawn down against accident excess. The end-of-rental
+//    refund workflow is intentionally absent — see docs/EXTENSIONS.md.
+//
+// 5. BRANCH IS THE TENANCY BOUNDARY. Almost every operational row carries
+//    `branchId`. PrismaService installs a middleware that injects a branch
+//    filter for scoped roles, so a forgotten `where` clause cannot leak data.
+// ============================================================================
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["relationJoins"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// ENUMS
+// ---------------------------------------------------------------------------
+
+/// Admin-side roles. Customers are NOT AdminUsers — they live in `Customer`
+/// and authenticate against a separate guard with a separate token audience.
+enum AdminRole {
+  SUPER_ADMIN /// Full access incl. policy settings, user management, all branches
+  OPERATIONS /// Fleet, maintenance, rentals, handovers. No financial approval.
+  ACCOUNTS /// Payments, invoices, collections, reports. No fleet mutation.
+  BRANCH_MANAGER /// Everything Operations + Accounts can do, scoped to own branch
+  VIEWER /// Read-only, all modules, no exports of PII
+}
+
+/// The nine operational states a vehicle can occupy. Transitions are validated
+/// by VehicleStatusMachine — e.g. a vehicle cannot go RENTED_OUT -> AVAILABLE
+/// without passing through CLEANING or INSPECTION.
+enum VehicleStatus {
+  AVAILABLE
+  RESERVED
+  RENTED_OUT
+  MAINTENANCE
+  CLEANING
+  INSPECTION
+  ACCIDENT_REPAIR
+  SOLD
+  INACTIVE
+}
+
+enum RentalStatus {
+  DRAFT
+  ACTIVE
+  ENDING_SOON /// Derived nightly: endDate within `rental.endingSoonDays`
+  COMPLETED
+  TERMINATED_EARLY
+  CANCELLED
+}
+
+enum BillingFrequency {
+  WEEKLY
+  MONTHLY
+}
+
+/// Invoice lifecycle. PARTIALLY_PAID is a real state, not a UI adjective:
+/// interest continues to accrue on the remaining principal only.
+enum InvoiceStatus {
+  UPCOMING
+  DUE
+  PENDING_VERIFICATION
+  PAID
+  PARTIALLY_PAID
+  OVERDUE
+  REJECTED
+  WRITTEN_OFF
+  CANCELLED
+}
+
+enum PaymentMethod {
+  PAYNOW
+  BANK_TRANSFER
+  CASH
+  CHEQUE
+  ADJUSTMENT /// Admin-initiated credit/debit, requires reason + audit entry
+}
+
+enum PaymentSubmissionStatus {
+  PENDING_VERIFICATION
+  APPROVED
+  REJECTED
+}
+
+/// Every movement of money or obligation. The sign convention:
+///   Positive `amountCents` INCREASES what the customer owes.
+///   Negative `amountCents` DECREASES what the customer owes.
+enum LedgerEntryType {
+  RENTAL_CHARGE /// + Periodic rent invoiced
+  LATE_INTEREST /// + Daily simple interest on outstanding principal
+  ACCIDENT_EXCESS /// + Excess charged after an at-fault accident
+  MISC_CHARGE /// + Fines, damage, admin fees, ERP/parking recharges
+  PAYMENT_RECEIVED /// - Verified customer payment
+  DEPOSIT_RECEIVED /// - Deposit taken (held, not income)
+  DEPOSIT_APPLIED /// - Deposit drawn down against an outstanding charge
+  CREDIT_NOTE /// - Goodwill / correction credit
+  WRITE_OFF /// - Balance abandoned as uncollectible
+  INTEREST_WAIVER /// - Late interest forgiven by ACCOUNTS+
+}
+
+enum MaintenanceType {
+  SCHEDULED_SERVICE
+  REPAIR
+  TYRE_REPLACEMENT
+  BATTERY_REPLACEMENT
+  ACCIDENT_REPAIR
+  INSPECTION
+  OTHER
+}
+
+/// Vehicle compliance dates that the reminder engine watches. Each type has
+/// its own reminder ladder, configured in PolicySetting (COE is 90/60/30/7,
+/// the rest are 30/14/7 by default).
+enum ExpiryType {
+  ROAD_TAX
+  INSURANCE
+  INSPECTION
+  COE
+  SERVICE_DUE
+}
+
+enum NotificationChannel {
+  IN_APP
+  EMAIL
+  WHATSAPP /// Adapter seam — interface implemented, transport not wired
+  SMS /// Adapter seam
+  PUSH /// Adapter seam
+}
+
+enum NotificationAudience {
+  ADMIN
+  CUSTOMER
+}
+
+enum NotificationStatus {
+  QUEUED
+  SENT
+  FAILED
+  READ
+}
+
+enum DocumentType {
+  RENTAL_AGREEMENT
+  VEHICLE_INSPECTION_FORM
+  INSURANCE_CERTIFICATE
+  ROAD_TAX_CERTIFICATE
+  COE_CERTIFICATE
+  PAYMENT_RECEIPT
+  INVOICE
+  PAYMENT_PROOF
+  SERVICE_INVOICE
+  ACCIDENT_REPORT
+  VEHICLE_PHOTO
+  IDENTITY_DOCUMENT
+  DRIVING_LICENCE
+  OTHER
+}
+
+// ---------------------------------------------------------------------------
+// ORGANISATION & IDENTITY
+// ---------------------------------------------------------------------------
+
+model Branch {
+  id        String   @id @default(cuid())
+  code      String   @unique /// e.g. "UBI", "TUAS" — used in vehicle/invoice refs
+  name      String
+  address   String
+  postal    String?
+  phone     String?
+  managerId String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  manager         AdminUser?        @relation("BranchManager", fields: [managerId], references: [id])
+  admins          AdminUser[]       @relation("AdminBranch")
+  vehicles        Vehicle[]
+  customers       Customer[]
+  rentals         RentalAgreement[]
+  invoices        Invoice[]
+  policySettings  PolicySetting[]
+
+  @@index([isActive])
+}
+
+model AdminUser {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  fullName     String
+  phone        String?
+  role         AdminRole
+  branchId     String? /// NULL = all-branch access (SUPER_ADMIN / head office)
+  isActive     Boolean   @default(true)
+  lastLoginAt  DateTime?
+
+  // Security posture
+  failedLoginCount Int       @default(0)
+  lockedUntil      DateTime?
+  /// NOT YET ENFORCED. These columns exist so enabling TOTP later is a code
+  /// change with no migration and no downtime, but nothing in the auth flow
+  /// currently checks them. Do not report MFA as active to an auditor until
+  /// the verification step in AuthService is implemented — see
+  /// docs/SECURITY.md "Pre-go-live checklist".
+  mfaSecret        String? /// TOTP seed. Must be encrypted at rest before use.
+  mfaEnabled       Boolean   @default(false)
+  passwordChangedAt DateTime @default(now())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  branch          Branch?             @relation("AdminBranch", fields: [branchId], references: [id])
+  managedBranches Branch[]            @relation("BranchManager")
+  refreshTokens   RefreshToken[]
+  auditLogs       AuditLog[]
+  notifications   Notification[]
+  verifiedPayments PaymentSubmission[] @relation("VerifiedBy")
+
+  @@index([role, isActive])
+  @@index([branchId])
+}
+
+model Customer {
+  id           String  @id @default(cuid())
+  customerRef  String  @unique /// Human-facing: VP-C-00042
+  email        String  @unique
+  passwordHash String?/// NULL until the customer activates their invited account
+  fullName     String
+  phone        String
+  nric         String? /// Masked in all API responses except SUPER_ADMIN/ACCOUNTS
+  address      String?
+  licenceNumber String?
+  licenceExpiry DateTime?
+  branchId     String
+
+  isActive          Boolean   @default(true)
+  invitedAt         DateTime?
+  activatedAt       DateTime?
+  lastLoginAt       DateTime?
+  failedLoginCount  Int       @default(0)
+  lockedUntil       DateTime?
+
+  /// Cached collections signal, recomputed nightly by RiskScoringJob.
+  /// 0 = pristine payer, 100 = maximum risk. See CollectionsService.
+  riskScore        Int      @default(0)
+  riskScoreUpdatedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  branch        Branch              @relation(fields: [branchId], references: [id])
+  rentals       RentalAgreement[]
+  invoices      Invoice[]
+  ledgerEntries LedgerEntry[]
+  submissions   PaymentSubmission[]
+  documents     Document[]
+  refreshTokens RefreshToken[]
+  notifications Notification[]
+
+  @@index([branchId, isActive])
+  @@index([riskScore])
+}
+
+/// Rotating refresh tokens. We store a SHA-256 hash, never the token itself.
+/// `replacedById` forms a chain so reuse of a rotated token is detectable —
+/// on detection the whole chain is revoked (token-theft response).
+model RefreshToken {
+  id           String    @id @default(cuid())
+  tokenHash    String    @unique
+  adminUserId  String?
+  customerId   String?
+  issuedAt     DateTime  @default(now())
+  expiresAt    DateTime
+  revokedAt    DateTime?
+  replacedById String?
+  userAgent    String?
+  ipAddress    String?
+
+  adminUser AdminUser? @relation(fields: [adminUserId], references: [id], onDelete: Cascade)
+  customer  Customer?  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([adminUserId])
+  @@index([customerId])
+  @@index([expiresAt])
+}
+
+// ---------------------------------------------------------------------------
+// FLEET
+// ---------------------------------------------------------------------------
+
+model Vehicle {
+  id            String        @id @default(cuid())
+  plateNumber   String        @unique /// e.g. SMR1337G
+  make          String
+  model         String
+  variant       String?
+  year          Int
+  colour        String?
+  chassisNumber String?       @unique
+  engineNumber  String?
+  seatingCapacity Int?
+  fuelType      String?
+  transmission  String?
+  branchId      String
+  status        VehicleStatus @default(AVAILABLE)
+
+  // Compliance dates — watched by the expiry reminder engine
+  coeExpiry       DateTime?
+  roadTaxExpiry   DateTime?
+  insuranceExpiry DateTime?
+  inspectionDue   DateTime?
+
+  insurerName     String?
+  policyNumber    String?
+  /// Standard excess payable by the renter on an at-fault claim.
+  accidentExcessCents BigInt @default(0)
+
+  // Servicing
+  currentMileageKm  Int       @default(0)
+  mileageUpdatedAt  DateTime?
+  lastServiceDate   DateTime?
+  lastServiceMileageKm Int?
+  nextServiceDate   DateTime?
+  nextServiceMileageKm Int?
+
+  // Commercials
+  purchasePriceCents BigInt?
+  purchaseDate       DateTime?
+  defaultWeeklyRateCents  BigInt?
+  defaultMonthlyRateCents BigInt?
+
+  notes     String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  branch          Branch             @relation(fields: [branchId], references: [id])
+  rentals         RentalAgreement[]
+  maintenance     MaintenanceRecord[]
+  accidents       AccidentRecord[]
+  documents       Document[]
+  photos          VehiclePhoto[]
+  statusHistory   VehicleStatusChange[]
+  expiryReminders ExpiryReminderLog[]
+
+  @@index([branchId, status])
+  @@index([status])
+  @@index([coeExpiry])
+  @@index([roadTaxExpiry])
+  @@index([insuranceExpiry])
+  @@index([inspectionDue])
+  @@index([nextServiceDate])
+}
+
+model VehiclePhoto {
+  id         String   @id @default(cuid())
+  vehicleId  String
+  s3Key      String
+  caption    String?
+  isPrimary  Boolean  @default(false)
+  sortOrder  Int      @default(0)
+  uploadedAt DateTime @default(now())
+
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@index([vehicleId, sortOrder])
+}
+
+/// Append-only audit of vehicle state transitions — answers "why was this car
+/// off the road for 9 days in March?" without guessing from maintenance rows.
+model VehicleStatusChange {
+  id         String        @id @default(cuid())
+  vehicleId  String
+  fromStatus VehicleStatus?
+  toStatus   VehicleStatus
+  reason     String?
+  changedBy  String?
+  changedAt  DateTime      @default(now())
+
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@index([vehicleId, changedAt])
+}
+
+model MaintenanceRecord {
+  id            String          @id @default(cuid())
+  vehicleId     String
+  type          MaintenanceType
+  description   String
+  workshopName  String?
+  workshopContact String?
+  serviceDate   DateTime
+  mileageKm     Int?
+  costCents     BigInt          @default(0)
+  invoiceNumber String?
+  nextServiceDate DateTime?
+  nextServiceMileageKm Int?
+  /// TRUE when the cost is recharged to the renter (damage, misuse) rather
+  /// than absorbed by Vida as fleet opex. Drives the Maintenance Cost report.
+  rechargedToCustomer Boolean @default(false)
+  notes         String?
+  createdBy     String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  vehicle   Vehicle    @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  documents Document[]
+
+  @@index([vehicleId, serviceDate])
+  @@index([type])
+}
+
+model AccidentRecord {
+  id                String   @id @default(cuid())
+  vehicleId         String
+  rentalAgreementId String?
+  incidentDate      DateTime
+  reportedDate      DateTime @default(now())
+  location          String?
+  description       String
+  policeReportNumber String?
+  insuranceClaimNumber String?
+  atFault           Boolean  @default(false)
+  /// Excess actually charged for THIS incident. Written to the ledger as an
+  /// ACCIDENT_EXCESS entry when `excessCharged` flips true.
+  excessAmountCents BigInt   @default(0)
+  excessCharged     Boolean  @default(false)
+  repairCostCents   BigInt   @default(0)
+  resolvedAt        DateTime?
+  notes             String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  vehicle   Vehicle          @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  rental    RentalAgreement? @relation(fields: [rentalAgreementId], references: [id])
+  documents Document[]
+
+  @@index([vehicleId, incidentDate])
+}
+
+// ---------------------------------------------------------------------------
+// RENTAL & BILLING
+// ---------------------------------------------------------------------------
+
+model RentalAgreement {
+  id          String       @id @default(cuid())
+  agreementNo String       @unique /// VP-R-2026-00187
+  customerId  String
+  vehicleId   String
+  branchId    String
+  status      RentalStatus @default(DRAFT)
+
+  startDate DateTime
+  endDate   DateTime
+  actualReturnDate DateTime?
+
+  billingFrequency BillingFrequency
+  rentAmountCents  BigInt /// Per billing period
+  /// Day-of-week (1=Mon..7=Sun) for WEEKLY, day-of-month (1-28) for MONTHLY.
+  /// Capped at 28 so no month is ever skipped.
+  billingAnchorDay Int
+
+  depositRequiredCents BigInt @default(0)
+  depositPaidCents     BigInt @default(0)
+  /// Cache of deposit held minus deposit applied. Ledger is authoritative.
+  depositBalanceCents  BigInt @default(0)
+
+  /// Snapshot of the vehicle's excess at signing, so later fleet-wide changes
+  /// don't retroactively alter a signed contract.
+  accidentExcessCents BigInt @default(0)
+
+  mileageAtStart Int?
+  mileageAtEnd   Int?
+  mileageCapKm   Int? /// NULL = unlimited
+  excessMileageRateCents BigInt?
+
+  /// Per-contract overrides. NULL falls back to branch, then global policy.
+  interestRateBpsOverride Int?
+  gracePeriodDaysOverride Int?
+
+  notes     String?
+  signedAt  DateTime?
+  createdBy String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  customer      Customer         @relation(fields: [customerId], references: [id])
+  vehicle       Vehicle          @relation(fields: [vehicleId], references: [id])
+  branch        Branch           @relation(fields: [branchId], references: [id])
+  invoices      Invoice[]
+  ledgerEntries LedgerEntry[]
+  documents     Document[]
+  accidents     AccidentRecord[]
+
+  @@index([customerId, status])
+  @@index([vehicleId, status])
+  @@index([branchId, status])
+  @@index([endDate])
+  @@index([status])
+}
+
+model Invoice {
+  id            String        @id @default(cuid())
+  invoiceNo     String        @unique /// VP-INV-2026-004312
+  rentalAgreementId String
+  customerId    String
+  branchId      String
+  status        InvoiceStatus @default(UPCOMING)
+
+  /// The rental period this invoice covers.
+  periodStart DateTime
+  periodEnd   DateTime
+  issueDate   DateTime
+  dueDate     DateTime
+
+  /// Principal = rent + any charges, EXCLUDING accrued interest.
+  /// Interest is tracked separately so we can waive it independently and so
+  /// interest never compounds (simple daily interest on principal only).
+  principalCents        BigInt
+  interestAccruedCents  BigInt @default(0)
+  interestWaivedCents   BigInt @default(0)
+  paidCents             BigInt @default(0)
+  /// Cache: principal + interestAccrued - interestWaived - paid. Ledger wins.
+  outstandingCents      BigInt
+
+  /// Last date an interest accrual ran for this invoice. The accrual job is
+  /// idempotent on (invoiceId, accrualDate) — a re-run cannot double-charge.
+  lastInterestAccrualDate DateTime?
+  /// Frozen snapshot of the policy in force when this invoice was issued, so
+  /// a later rate change does not retroactively rewrite history.
+  appliedInterestRateBps Int
+  appliedGracePeriodDays Int
+
+  paidAt      DateTime?
+  writtenOffAt DateTime?
+  cancelledAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  rental        RentalAgreement     @relation(fields: [rentalAgreementId], references: [id])
+  customer      Customer            @relation(fields: [customerId], references: [id])
+  branch        Branch              @relation(fields: [branchId], references: [id])
+  lines         InvoiceLine[]
+  ledgerEntries LedgerEntry[]
+  submissions   PaymentSubmission[]
+  payments      Payment[]
+  reminders     ReminderLog[]
+  documents     Document[]
+
+  @@index([customerId, status])
+  @@index([branchId, status])
+  @@index([status, dueDate])
+  @@index([dueDate])
+  @@index([rentalAgreementId])
+}
+
+model InvoiceLine {
+  id          String   @id @default(cuid())
+  invoiceId   String
+  description String
+  quantity    Int      @default(1)
+  unitPriceCents BigInt
+  amountCents BigInt
+  sortOrder   Int      @default(0)
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId, sortOrder])
+}
+
+/// THE SOURCE OF TRUTH FOR MONEY. Append-only: rows are never updated or
+/// deleted. A mistake is corrected by writing a compensating entry, exactly
+/// like a real journal. `balanceAfterCents` is the running customer balance
+/// at the moment of the entry, which makes the audit trail readable without
+/// replaying the whole history.
+model LedgerEntry {
+  id         String          @id @default(cuid())
+  customerId String
+  rentalAgreementId String?
+  invoiceId  String?
+  type       LedgerEntryType
+  /// Positive increases customer debt, negative decreases it. Always cents.
+  amountCents BigInt
+  balanceAfterCents BigInt
+  description String
+  /// Business date the entry applies to (may differ from createdAt for
+  /// back-dated accruals). Interest idempotency keys off this.
+  effectiveDate DateTime
+  /// Idempotency guard. e.g. "interest:inv_abc123:2026-08-06". A unique index
+  /// makes a duplicate job run a no-op instead of a double charge.
+  idempotencyKey String? @unique
+  createdBy  String? /// NULL = system/automation
+  createdAt  DateTime @default(now())
+
+  customer Customer         @relation(fields: [customerId], references: [id])
+  rental   RentalAgreement? @relation(fields: [rentalAgreementId], references: [id])
+  invoice  Invoice?         @relation(fields: [invoiceId], references: [id])
+
+  @@index([customerId, effectiveDate])
+  @@index([invoiceId])
+  @@index([type, effectiveDate])
+}
+
+/// What the customer submits after clicking "I've Made Payment".
+/// This is a CLAIM, not money. It becomes a `Payment` only on admin approval.
+model PaymentSubmission {
+  id         String                  @id @default(cuid())
+  invoiceId  String
+  customerId String
+  status     PaymentSubmissionStatus @default(PENDING_VERIFICATION)
+  method     PaymentMethod           @default(PAYNOW)
+  declaredAmountCents BigInt
+  transactionRef String /// Required — the bank reference the customer quotes
+  paidOnDate DateTime
+  /// Optional screenshot, stored in S3. Key only; served via signed URL.
+  proofS3Key String?
+  customerNote String?
+
+  submittedAt DateTime @default(now())
+  reviewedAt  DateTime?
+  reviewedById String?
+  rejectionReason String?
+  /// Amount the admin actually confirmed — may differ from declared
+  /// (short payment, bank fee deducted). This is what hits the ledger.
+  approvedAmountCents BigInt?
+
+  invoice    Invoice    @relation(fields: [invoiceId], references: [id])
+  customer   Customer   @relation(fields: [customerId], references: [id])
+  reviewedBy AdminUser? @relation("VerifiedBy", fields: [reviewedById], references: [id])
+  payment    Payment?
+
+  @@index([status, submittedAt])
+  @@index([invoiceId])
+  @@index([customerId])
+}
+
+/// Verified, real money. Created only by an approval transition.
+model Payment {
+  id          String        @id @default(cuid())
+  receiptNo   String        @unique /// VP-RCP-2026-002145
+  invoiceId   String
+  submissionId String?      @unique
+  amountCents BigInt
+  method      PaymentMethod
+  transactionRef String?
+  receivedOn  DateTime
+  recordedById String?
+  /// S3 key of the generated PDF receipt.
+  receiptS3Key String?
+  notes       String?
+  createdAt   DateTime      @default(now())
+
+  invoice    Invoice            @relation(fields: [invoiceId], references: [id])
+  submission PaymentSubmission? @relation(fields: [submissionId], references: [id])
+
+  @@index([invoiceId])
+  @@index([receivedOn])
+}
+
+// ---------------------------------------------------------------------------
+// AUTOMATION: POLICY, REMINDERS, NOTIFICATIONS
+// ---------------------------------------------------------------------------
+
+/// Admin-editable business rules. NOTHING in the billing or reminder engine
+/// reads a hardcoded constant — it all resolves through here.
+///
+/// Resolution order: contract override -> branch setting -> global setting
+/// -> compiled default (packages/shared/src/policy-defaults.ts).
+///
+/// Values are stored as strings and parsed by a typed accessor so a new rule
+/// never needs a migration. `version` + `effectiveFrom` keep history: changing
+/// the interest rate does not rewrite invoices already issued.
+model PolicySetting {
+  id          String   @id @default(cuid())
+  key         String /// e.g. "billing.interestRateBps"
+  value       String
+  branchId    String? /// NULL = global
+  description String?
+  version     Int      @default(1)
+  effectiveFrom DateTime @default(now())
+  updatedById String?
+  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now())
+
+  branch Branch? @relation(fields: [branchId], references: [id])
+
+  @@unique([key, branchId, version])
+  @@index([key, branchId])
+}
+
+/// Idempotency + audit for payment reminders. The unique constraint is what
+/// guarantees a customer is never emailed the same reminder twice, even if
+/// the worker restarts mid-sweep.
+model ReminderLog {
+  id        String   @id @default(cuid())
+  invoiceId String
+  /// "T-3", "T-1", "T-0", "OVERDUE-3", "OVERDUE-6", ...
+  reminderCode String
+  channel   NotificationChannel
+  sentAt    DateTime @default(now())
+  success   Boolean  @default(true)
+  errorMessage String?
+  /// Snapshot of the amount quoted in the reminder, for dispute resolution.
+  quotedAmountCents BigInt
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@unique([invoiceId, reminderCode, channel])
+  @@index([sentAt])
+}
+
+/// Same idea, for vehicle compliance expiries (road tax / insurance /
+/// inspection / COE). Unique on (vehicle, type, threshold, expiry date) so
+/// renewing a road tax naturally re-arms the whole ladder for the new date.
+model ExpiryReminderLog {
+  id         String     @id @default(cuid())
+  vehicleId  String
+  expiryType ExpiryType
+  /// Days-before threshold that fired: 90, 60, 30, 14, 7...
+  daysBefore Int
+  expiryDate DateTime
+  sentAt     DateTime   @default(now())
+
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@unique([vehicleId, expiryType, daysBefore, expiryDate])
+  @@index([sentAt])
+}
+
+model Notification {
+  id          String               @id @default(cuid())
+  audience    NotificationAudience
+  adminUserId String?
+  customerId  String?
+  branchId    String?
+  /// Machine code, e.g. "payment.submitted", "vehicle.coe_expiring".
+  eventType   String
+  title       String
+  body        String
+  /// Deep link into the relevant dashboard screen.
+  actionUrl   String?
+  channel     NotificationChannel  @default(IN_APP)
+  status      NotificationStatus   @default(QUEUED)
+  severity    String               @default("info") /// info | warning | critical
+  metadata    Json?
+  sentAt      DateTime?
+  readAt      DateTime?
+  createdAt   DateTime             @default(now())
+
+  adminUser AdminUser? @relation(fields: [adminUserId], references: [id], onDelete: Cascade)
+  customer  Customer?  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([adminUserId, status, createdAt])
+  @@index([customerId, status, createdAt])
+  @@index([eventType])
+}
+
+// ---------------------------------------------------------------------------
+// DOCUMENTS & AUDIT
+// ---------------------------------------------------------------------------
+
+/// All binaries live in S3; Postgres holds only the key + metadata. Downloads
+/// are served as short-lived presigned URLs, never public objects.
+model Document {
+  id       String       @id @default(cuid())
+  type     DocumentType
+  title    String
+  s3Key    String
+  mimeType String
+  sizeBytes Int
+  checksumSha256 String?
+
+  // Optional owners — a document hangs off exactly one of these.
+  customerId        String?
+  vehicleId         String?
+  rentalAgreementId String?
+  invoiceId         String?
+  maintenanceRecordId String?
+  accidentRecordId  String?
+
+  /// TRUE if the customer may see/download it in the portal.
+  visibleToCustomer Boolean @default(false)
+
+  uploadedById String?
+  uploadedByCustomer Boolean @default(false)
+  expiresAt   DateTime? /// For time-bound docs like insurance certs
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  customer    Customer?          @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  vehicle     Vehicle?           @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  rental      RentalAgreement?   @relation(fields: [rentalAgreementId], references: [id], onDelete: Cascade)
+  invoice     Invoice?           @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  maintenance MaintenanceRecord? @relation(fields: [maintenanceRecordId], references: [id], onDelete: Cascade)
+  accident    AccidentRecord?    @relation(fields: [accidentRecordId], references: [id], onDelete: Cascade)
+
+  @@index([customerId, type])
+  @@index([vehicleId, type])
+  @@index([rentalAgreementId])
+  @@index([type])
+}
+
+/// Immutable audit trail. Written by an interceptor on every mutating request
+/// and by every money-moving service call. Required for PDPA accountability
+/// and for answering "who waived that interest?".
+model AuditLog {
+  id          String   @id @default(cuid())
+  actorAdminId String?
+  actorCustomerId String?
+  actorType   String /// ADMIN | CUSTOMER | SYSTEM
+  action      String /// e.g. "payment.approve", "policy.update"
+  entityType  String
+  entityId    String
+  /// Redacted diff — secrets and NRIC are stripped before persistence.
+  before      Json?
+  after       Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  actorAdmin AdminUser? @relation(fields: [actorAdminId], references: [id])
+
+  @@index([entityType, entityId, createdAt])
+  @@index([actorAdminId, createdAt])
+  @@index([action, createdAt])
+}
