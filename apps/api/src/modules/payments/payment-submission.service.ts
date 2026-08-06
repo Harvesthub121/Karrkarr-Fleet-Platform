@@ -5,7 +5,7 @@
  *   1. Customer submits: uploads optional proof + mandatory txn reference.
  *      Invoice -> PENDING_VERIFICATION. Admin notified.
  *   2. Admin approves: creates Payment + PAYMENT_RECEIVED ledger entry.
- *      Generates receipt PDF + receipt number VP-RCP-YYYY-NNNNNN.
+ *      Generates receipt PDF + receipt number KR-RCP-YYYY-NNNNNN.
  *      Invoice -> PAID or PARTIALLY_PAID (if approvedAmount < outstanding).
  *      Customer emailed confirmation with receipt PDF.
  *   3. Admin rejects: reason required. Invoice returns to its prior status.
@@ -28,7 +28,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { LedgerService } from '../billing/ledger.service';
 import { S3Service } from '../documents/s3.service';
 import { NotificationService } from '../notifications/notification.service';
-import { formatSgd } from '@vida/shared';
+import { formatSgd } from '@karrkarr/shared';
 import * as PDFDocument from 'pdfkit';
 
 export interface SubmitPaymentDto {
@@ -71,7 +71,7 @@ export class PaymentSubmissionService {
   private async ensureReceiptSequence(): Promise<void> {
     if (this.receiptSequenceBootstrapped) return;
     await this.prisma.$executeRawUnsafe(
-      `CREATE SEQUENCE IF NOT EXISTS vida_receipt_seq START 1 INCREMENT 1`,
+      `CREATE SEQUENCE IF NOT EXISTS karrkarr_receipt_seq START 1 INCREMENT 1`,
     );
     this.receiptSequenceBootstrapped = true;
   }
@@ -81,10 +81,10 @@ export class PaymentSubmissionService {
     tx: Prisma.TransactionClient,
   ): Promise<string> {
     const result = await tx.$queryRaw<[{ nextval: bigint }]>(
-      Prisma.sql`SELECT nextval('vida_receipt_seq')`,
+      Prisma.sql`SELECT nextval('karrkarr_receipt_seq')`,
     );
     const seq = Number(result[0].nextval).toString().padStart(6, '0');
-    return `VP-RCP-${year}-${seq}`;
+    return `KR-RCP-${year}-${seq}`;
   }
 
   async submitPayment(dto: SubmitPaymentDto): Promise<{ submissionId: string }> {
@@ -367,7 +367,7 @@ export class PaymentSubmissionService {
 
       doc
         .fontSize(20)
-        .text('VIDA PARTNERS PTE LTD', { align: 'center' })
+        .text('KARRKARR PTE LTD', { align: 'center' })
         .moveDown(0.5)
         .fontSize(14)
         .text('OFFICIAL RECEIPT', { align: 'center' })
