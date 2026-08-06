@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 import { getSession } from '@/lib/session';
 import { LoginForm } from './LoginForm';
 
-export const metadata = { title: 'Sign In — Vida Partners Portal' };
+export const metadata = { title: 'Sign In — Karrkarr Portal' };
 
 export default async function LoginPage({
   searchParams,
@@ -24,7 +24,7 @@ export default async function LoginPage({
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
             </svg>
           </div>
-          <h1 className="text-xl font-bold text-gray-900">Vida Partners</h1>
+          <h1 className="text-xl font-bold text-gray-900">Karrkarr</h1>
           <p className="mt-1 text-sm text-gray-500">Customer Portal</p>
         </div>
 
@@ -32,8 +32,8 @@ export default async function LoginPage({
 
         <p className="mt-6 text-center text-xs text-gray-400">
           For assistance, contact{' '}
-          <a href="mailto:support@vidapartners.com.sg" className="text-teal-600 underline underline-offset-2">
-            support@vidapartners.com.sg
+          <a href="mailto:support@karrkarr.com.sg" className="text-teal-600 underline underline-offset-2">
+            support@karrkarr.com.sg
           </a>
         </p>
       </div>
