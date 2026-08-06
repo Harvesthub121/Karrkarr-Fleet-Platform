@@ -9,8 +9,8 @@ import { Can } from '@/lib/permissions';
 import { useToast } from '@/components/ui/Toast';
 import { Modal } from '@/components/ui/Modal';
 import { cn, formatDate, daysFromNow, getExpiryUrgency } from '@/lib/utils';
-import { PERMISSIONS } from '@vida/shared';
-import type { VehicleStatusName } from '@vida/shared';
+import { PERMISSIONS } from '@karrkarr/shared';
+import type { VehicleStatusName } from '@karrkarr/shared';
 
 // Types
 interface VehicleDetail {
