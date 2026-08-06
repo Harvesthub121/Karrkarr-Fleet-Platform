@@ -8,7 +8,7 @@ import { MoneyCents } from '@/components/ui/MoneyCell';
 import { Can } from '@/lib/permissions';
 import { useToast } from '@/components/ui/Toast';
 import { formatDate, cn } from '@/lib/utils';
-import { PERMISSIONS } from '@vida/shared';
+import { PERMISSIONS } from '@karrkarr/shared';
 
 interface CustomerDetail {
   id: string;
