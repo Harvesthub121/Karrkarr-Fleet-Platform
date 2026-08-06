@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { crc16, buildPayNowPayload, verifyPayNowPayload, sanitiseReference } from '@vida/shared';
+import { crc16, buildPayNowPayload, verifyPayNowPayload, sanitiseReference } from '@karrkarr/shared';
 
 describe('CRC-16/CCITT-FALSE', () => {
   // Known-good test vectors from the EMVCo MPM spec and community test suites
@@ -18,9 +18,9 @@ describe('CRC-16/CCITT-FALSE', () => {
     // We verify round-trip: build → verify
     const payload = buildPayNowPayload({
       uen: '202512345K',
-      merchantName: 'VIDA PARTNERS PTE LTD',
+      merchantName: 'KARRKARR PTE LTD',
       amountCents: 100_00n,
-      reference: 'VPINV2026004312',
+      reference: 'KRINV2026004312',
       editable: false,
       expiryDate: new Date('2026-09-05'),
     });
@@ -30,9 +30,9 @@ describe('CRC-16/CCITT-FALSE', () => {
   it('CRC changes if payload is modified (tamper detection)', () => {
     const original = buildPayNowPayload({
       uen: '202512345K',
-      merchantName: 'VIDA PARTNERS PTE LTD',
+      merchantName: 'KARRKARR PTE LTD',
       amountCents: 100_00n,
-      reference: 'VPINV2026000001',
+      reference: 'KRINV2026000001',
     });
     // Flip one character before the CRC
     const tampered = original.slice(0, 10) + 'X' + original.slice(11);
@@ -78,10 +78,10 @@ describe('buildPayNowPayload', () => {
       uen: '202512345K',
       merchantName: 'TEST',
       amountCents: 1_00n,
-      reference: 'VP-INV-2026-000001',
+      reference: 'KR-INV-2026-000001',
     });
-    // Reference should be sanitised: VPINV2026000001
-    expect(payload).toContain('VPINV2026000001');
+    // Reference should be sanitised: KRINV2026000001
+    expect(payload).toContain('KRINV2026000001');
   });
 
   it('throws if UEN is empty', () => {
@@ -93,7 +93,7 @@ describe('buildPayNowPayload', () => {
 
 describe('sanitiseReference', () => {
   it('uppercases and strips non-alphanumeric', () => {
-    expect(sanitiseReference('vp-inv-2026-000001')).toBe('VPINV2026000001');
+    expect(sanitiseReference('vp-inv-2026-000001')).toBe('KRINV2026000001');
   });
   it('truncates to 25 chars', () => {
     const long = 'A'.repeat(30);
