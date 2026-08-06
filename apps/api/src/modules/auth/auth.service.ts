@@ -8,7 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { PrismaService } from '../../prisma/prisma.service';
-import { ROLE_PERMISSIONS, isBranchScoped } from '@vida/shared';
+import { ROLE_PERMISSIONS, isBranchScoped } from '@karrkarr/shared';
 import type { AdminUser, Customer } from '@prisma/client';
 import type { AdminLoginDto, CustomerLoginDto, RefreshDto } from './dto/auth.dto';
 
@@ -33,8 +33,8 @@ export interface TokenPair {
 // A customer token presented to an admin endpoint must be rejected even if
 // both are signed with valid secrets, because the guard checks `aud`.
 // ---------------------------------------------------------------------------
-export const ADMIN_JWT_AUDIENCE = 'vida:admin';
-export const CUSTOMER_JWT_AUDIENCE = 'vida:customer';
+export const ADMIN_JWT_AUDIENCE = 'karrkarr:admin';
+export const CUSTOMER_JWT_AUDIENCE = 'karrkarr:customer';
 
 @Injectable()
 export class AuthService {
@@ -203,7 +203,7 @@ export class AuthService {
     try {
       payload = this.jwt.verify(token, {
         secret: process.env.JWT_CUSTOMER_SECRET,
-        audience: 'vida:invite',
+        audience: 'karrkarr:invite',
       }) as { sub: string; aud: string };
     } catch {
       throw new UnauthorizedException('Invalid or expired invitation link');
@@ -227,7 +227,7 @@ export class AuthService {
       { sub: customerId },
       {
         secret: process.env.JWT_CUSTOMER_SECRET,
-        audience: 'vida:invite',
+        audience: 'karrkarr:invite',
         expiresIn: '7d',
       },
     );
