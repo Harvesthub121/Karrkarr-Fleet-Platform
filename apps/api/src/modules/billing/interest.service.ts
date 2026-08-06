@@ -1,6 +1,6 @@
 /**
  * InterestService — wraps calculateAccrual and writes LATE_INTEREST ledger
- * entries. The core accrual logic lives in @vida/shared/interest.ts (pure fn).
+ * entries. The core accrual logic lives in @karrkarr/shared/interest.ts (pure fn).
  *
  * Idempotency: idempotencyKey = `interest:{invoiceId}:{YYYY-MM-DD}` (UTC).
  * The DB unique index on LedgerEntry.idempotencyKey turns a duplicate accrual
@@ -26,7 +26,7 @@ import {
   toUtcMidnight,
   isoDate,
   POLICY_KEYS,
-} from '@vida/shared';
+} from '@karrkarr/shared';
 
 @Injectable()
 export class InterestService {
