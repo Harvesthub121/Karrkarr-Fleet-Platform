@@ -1,4 +1,4 @@
-# Billing Rules — Plain English Guide for Vida Partners Operations
+# Billing Rules — Plain English Guide for Karrkarr Operations
 
 This document explains how the billing system works for non-technical staff. It covers invoice generation, late interest, partial payments, and what you can change in the settings without calling a developer.
 
@@ -97,7 +97,7 @@ The payment is applied to the invoice. The invoice status becomes PARTIALLY_PAID
 
 ## The Payment Verification Workflow
 
-Vida Partners does not have an automated payment gateway. Payments are verified manually. This is the sequence:
+Karrkarr does not have an automated payment gateway. Payments are verified manually. This is the sequence:
 
 1. **Customer submits a payment claim** via the customer portal. They enter:
    - The invoice they are paying
@@ -153,7 +153,7 @@ To apply a different rate to an individual contract, set `interestRateBpsOverrid
 
 ## GST
 
-**Vida Partners Pte Ltd is not GST-registered.** There are no tax lines on any invoice. If Vida becomes GST-registered in the future, this will require a settings change (`tax.rateBps`) and an update to the invoice template. It will not require a database migration.
+**Karrkarr Pte Ltd is not GST-registered.** There are no tax lines on any invoice. If Karrkarr becomes GST-registered in the future, this will require a settings change (`tax.rateBps`) and an update to the invoice template. It will not require a database migration.
 
 ---
 
