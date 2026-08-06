@@ -2,7 +2,7 @@
  * InvoiceService — generates, numbers, and manages invoice lifecycle.
  *
  * Key design decisions:
- *   - Invoice numbers are VP-INV-YYYY-NNNNNN, using a DB sequence via a
+ *   - Invoice numbers are KR-INV-YYYY-NNNNNN, using a DB sequence via a
  *     raw SELECT nextval() inside the creating transaction to be collision-safe
  *     under concurrent requests. We create the sequence on first use via
  *     CREATE SEQUENCE IF NOT EXISTS.
@@ -22,7 +22,7 @@ import { InvoiceStatus, BillingFrequency, LedgerEntryType, Prisma } from '@prism
 import { PrismaService } from '../../prisma/prisma.service';
 import { PolicyService } from '../policy/policy.service';
 import { LedgerService } from './ledger.service';
-import { POLICY_KEYS } from '@vida/shared';
+import { POLICY_KEYS } from '@karrkarr/shared';
 
 export interface GenerateInvoiceInput {
   rentalAgreementId: string;
@@ -48,17 +48,17 @@ export class InvoiceService {
   private async ensureSequence(): Promise<void> {
     if (this.sequenceBootstrapped) return;
     await this.prisma.$executeRawUnsafe(
-      `CREATE SEQUENCE IF NOT EXISTS vida_invoice_seq START 1 INCREMENT 1`,
+      `CREATE SEQUENCE IF NOT EXISTS karrkarr_invoice_seq START 1 INCREMENT 1`,
     );
     this.sequenceBootstrapped = true;
   }
 
   private async nextInvoiceNumber(year: number, tx: Prisma.TransactionClient): Promise<string> {
     const result = await tx.$queryRaw<[{ nextval: bigint }]>(
-      Prisma.sql`SELECT nextval('vida_invoice_seq')`,
+      Prisma.sql`SELECT nextval('karrkarr_invoice_seq')`,
     );
     const seq = Number(result[0].nextval).toString().padStart(6, '0');
-    return `VP-INV-${year}-${seq}`;
+    return `KR-INV-${year}-${seq}`;
   }
 
   async generateInvoice(input: GenerateInvoiceInput): Promise<string> {
