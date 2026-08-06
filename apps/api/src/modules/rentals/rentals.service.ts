@@ -62,12 +62,12 @@ export class RentalsService {
       throw new ConflictException(`Vehicle is not available (current status: ${vehicle.status})`);
     }
 
-    // Generate agreement number VP-R-{year}-{seq}
+    // Generate agreement number KR-R-{year}-{seq}
     const year = new Date().getFullYear();
     const count = await this.prisma.rentalAgreement.count({
-      where: { agreementNo: { startsWith: `VP-R-${year}-` } },
+      where: { agreementNo: { startsWith: `KR-R-${year}-` } },
     });
-    const agreementNo = `VP-R-${year}-${String(count + 1).padStart(5, '0')}`;
+    const agreementNo = `KR-R-${year}-${String(count + 1).padStart(5, '0')}`;
 
     return this.prisma.$transaction(async (tx) => {
       const rental = await tx.rentalAgreement.create({
