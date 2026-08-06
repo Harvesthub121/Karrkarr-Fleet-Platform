@@ -4,7 +4,7 @@ import { useState, useCallback } from 'react';
 import { apiGet } from '@/lib/api-client';
 import { Can } from '@/lib/permissions';
 import { useToast } from '@/components/ui/Toast';
-import { PERMISSIONS } from '@vida/shared';
+import { PERMISSIONS } from '@karrkarr/shared';
 import { cn } from '@/lib/utils';
 
 type ReportType =
