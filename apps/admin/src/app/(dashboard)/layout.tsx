@@ -4,12 +4,12 @@ import { useEffect, type ReactNode } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { SessionProvider } from '@/lib/permissions';
 import { ToastProvider } from '@/components/ui/Toast';
-import type { AuthedAdmin } from '@vida/shared';
+import type { AuthedAdmin } from '@karrkarr/shared';
 
 function getSessionUser(): AuthedAdmin | null {
   if (typeof window === 'undefined') return null;
   try {
-    const raw = sessionStorage.getItem('vida_admin_session');
+    const raw = sessionStorage.getItem('karrkarr_admin_session');
     return raw ? JSON.parse(raw) : null;
   } catch {
     return null;
