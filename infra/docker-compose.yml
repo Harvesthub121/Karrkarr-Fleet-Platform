@@ -1,0 +1,60 @@
+version: '3.9'
+
+# Local development stack for the Vida Partners Fleet Leasing Platform.
+#   docker compose -f infra/docker-compose.yml up -d
+# Postgres holds all business state. Redis backs BullMQ queues (reminders,
+# interest accrual, expiry alerts). MinIO stands in for AWS S3 locally so the
+# document/proof upload path is exercised identically in dev and prod.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: vida-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: vida
+      POSTGRES_PASSWORD: vida_dev_password
+      POSTGRES_DB: vida_fleet
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U vida -d vida_fleet']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: vida-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    ports:
+      - '6379:6379'
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  minio:
+    image: minio/minio:latest
+    container_name: vida-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: vida_minio
+      MINIO_ROOT_PASSWORD: vida_minio_password
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - miniodata:/data
+
+volumes:
+  pgdata:
+  redisdata:
+  miniodata:
