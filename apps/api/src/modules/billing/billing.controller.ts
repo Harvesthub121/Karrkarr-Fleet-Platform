@@ -20,7 +20,7 @@ import { RequirePermissions } from '../auth/decorators/require-permissions.decor
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { AdminJwtGuard } from '../auth/guards/admin-jwt.guard';
 import { PermissionsGuard } from '../auth/guards/permissions.guard';
-import { PERMISSIONS } from '@vida/shared';
+import { PERMISSIONS } from '@karrkarr/shared';
 import { IsString, IsNotEmpty, IsInt, Min, IsOptional, IsDateString } from 'class-validator';
 import { Type } from 'class-transformer';
 
