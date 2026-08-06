@@ -17,14 +17,15 @@ export function MoneyCell({ value, dim, className }: MoneyCellProps) {
 
 interface MoneyCentsProps {
   cents: number;
+  dim?: boolean;
   className?: string;
 }
 
 /** Formats raw cents as S$ display. For cases where only cents are available. */
-export function MoneyCents({ cents, className }: MoneyCentsProps) {
+export function MoneyCents({ cents, dim, className }: MoneyCentsProps) {
   const display = `S$${(cents / 100).toLocaleString('en-SG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   return (
-    <span className={cn('tabular-nums slashed-zero', className)}>
+    <span className={cn('tabular-nums slashed-zero', dim && 'text-zinc-400', className)}>
       {display}
     </span>
   );
