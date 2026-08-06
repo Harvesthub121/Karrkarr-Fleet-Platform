@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Vida Fleet Admin',
-  description: 'Vida Partners Pte Ltd — Fleet Operations Dashboard',
+  title: 'Karrkarr Fleet Admin',
+  description: 'Karrkarr Pte Ltd — Fleet Operations Dashboard',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
