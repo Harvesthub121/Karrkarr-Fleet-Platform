@@ -23,7 +23,7 @@ export class CustomerJwtStrategy extends PassportStrategy(Strategy, CUSTOMER_JWT
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: process.env.JWT_CUSTOMER_SECRET ?? 'fallback-change-me',
-      audience: 'vida:customer',
+      audience: 'karrkarr:customer',
     });
   }
 
