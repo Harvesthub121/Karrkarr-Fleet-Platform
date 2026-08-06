@@ -4,7 +4,7 @@ import { JobsService } from './jobs.service';
 import { RequirePermissions } from '../auth/decorators/require-permissions.decorator';
 import { AdminJwtGuard } from '../auth/guards/admin-jwt.guard';
 import { PermissionsGuard } from '../auth/guards/permissions.guard';
-import { PERMISSIONS } from '@vida/shared';
+import { PERMISSIONS } from '@karrkarr/shared';
 
 /**
  * JobsController — manual trigger endpoints for SUPER_ADMIN ops use.
