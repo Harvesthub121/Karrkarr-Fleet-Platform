@@ -241,9 +241,9 @@ test('crc16 is a correct CRC-16/CCITT-FALSE implementation', () => {
 test('generated PayNow payload passes its own checksum', () => {
   const payload = buildPayNowPayload({
     uen: '202512345K',
-    merchantName: 'VIDA PARTNERS PTE LTD',
+    merchantName: 'KARRKARR PTE LTD',
     amountCents: 80_000n,
-    reference: 'VP-INV-2026-004312',
+    reference: 'KR-INV-2026-004312',
   });
   assert.equal(verifyPayNowPayload(payload), true);
 });
@@ -251,9 +251,9 @@ test('generated PayNow payload passes its own checksum', () => {
 test('payload embeds SGD, Singapore, the exact amount and a locked amount flag', () => {
   const payload = buildPayNowPayload({
     uen: '202512345K',
-    merchantName: 'VIDA PARTNERS PTE LTD',
+    merchantName: 'KARRKARR PTE LTD',
     amountCents: 80_000n,
-    reference: 'VP-INV-2026-004312',
+    reference: 'KR-INV-2026-004312',
   });
   assert.ok(payload.startsWith('000201'));
   // Field 01, length 02, value 12 = dynamic QR (amount baked in, single use).
@@ -262,20 +262,20 @@ test('payload embeds SGD, Singapore, the exact amount and a locked amount flag',
   assert.ok(payload.includes('5303702')); // SGD
   assert.ok(payload.includes('5802SG'));
   assert.ok(payload.includes('5406800.00')); // amount, field 54, length 06
-  assert.ok(payload.includes('VPINV2026004312')); // sanitised reference
+  assert.ok(payload.includes('KRINV2026004312')); // sanitised reference
 });
 
 test('a tampered payload fails verification', () => {
   const payload = buildPayNowPayload({
-    uen: '202512345K', merchantName: 'VIDA PARTNERS PTE LTD',
-    amountCents: 80_000n, reference: 'VP-INV-1',
+    uen: '202512345K', merchantName: 'KARRKARR PTE LTD',
+    amountCents: 80_000n, reference: 'KR-INV-1',
   });
   // Flip the amount from 800.00 to 900.00 and the CRC must no longer match.
   assert.equal(verifyPayNowPayload(payload.replace('5406800.00', '5406900.00')), false);
 });
 
 test('reference sanitisation strips punctuation banks would mangle', () => {
-  assert.equal(sanitiseReference('VP-INV-2026-004312'), 'VPINV2026004312');
+  assert.equal(sanitiseReference('KR-INV-2026-004312'), 'KRINV2026004312');
   assert.equal(sanitiseReference('inv/123 456'), 'INV123456');
   assert.throws(() => sanitiseReference('---'));
 });
