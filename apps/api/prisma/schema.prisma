@@ -1,5 +1,5 @@
 // ============================================================================
-// Vida Partners Pte Ltd — Fleet Leasing Management Platform
+// Karrkarr Pte Ltd — Fleet Leasing Management Platform
 // Prisma schema (PostgreSQL)
 // ============================================================================
 //
@@ -14,9 +14,9 @@
 //    and RentalAgreement.depositBalanceCents exist ONLY as denormalised caches
 //    maintained inside the same transaction that writes the ledger entry. If
 //    they ever disagree with the ledger, the ledger wins and the cache is
-//    rebuilt (see `pnpm --filter @vida/api ledger:reconcile`).
+//    rebuilt (see `pnpm --filter @karrkarr/api ledger:reconcile`).
 //
-// 3. VIDA PARTNERS IS NOT GST-REGISTERED. There are deliberately no tax lines.
+// 3. KARRKARR IS NOT GST-REGISTERED. There are deliberately no tax lines.
 //    `PolicySetting` carries a `taxRateBps` key defaulted to 0 and unused, so
 //    registration later is a settings change plus an invoice-template change,
 //    not a schema migration.
@@ -251,7 +251,7 @@ model AdminUser {
 
 model Customer {
   id           String  @id @default(cuid())
-  customerRef  String  @unique /// Human-facing: VP-C-00042
+  customerRef  String  @unique /// Human-facing: KR-C-00042
   email        String  @unique
   passwordHash String?/// NULL until the customer activates their invited account
   fullName     String
@@ -425,7 +425,7 @@ model MaintenanceRecord {
   nextServiceDate DateTime?
   nextServiceMileageKm Int?
   /// TRUE when the cost is recharged to the renter (damage, misuse) rather
-  /// than absorbed by Vida as fleet opex. Drives the Maintenance Cost report.
+  /// than absorbed by Karrkarr as fleet opex. Drives the Maintenance Cost report.
   rechargedToCustomer Boolean @default(false)
   notes         String?
   createdBy     String?
@@ -473,7 +473,7 @@ model AccidentRecord {
 
 model RentalAgreement {
   id          String       @id @default(cuid())
-  agreementNo String       @unique /// VP-R-2026-00187
+  agreementNo String       @unique /// KR-R-2026-00187
   customerId  String
   vehicleId   String
   branchId    String
@@ -530,7 +530,7 @@ model RentalAgreement {
 
 model Invoice {
   id            String        @id @default(cuid())
-  invoiceNo     String        @unique /// VP-INV-2026-004312
+  invoiceNo     String        @unique /// KR-INV-2026-004312
   rentalAgreementId String
   customerId    String
   branchId      String
@@ -667,7 +667,7 @@ model PaymentSubmission {
 /// Verified, real money. Created only by an approval transition.
 model Payment {
   id          String        @id @default(cuid())
-  receiptNo   String        @unique /// VP-RCP-2026-002145
+  receiptNo   String        @unique /// KR-RCP-2026-002145
   invoiceId   String
   submissionId String?      @unique
   amountCents BigInt
