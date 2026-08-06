@@ -1,4 +1,4 @@
-import type { InvoiceStatusName } from '@vida/shared';
+import type { InvoiceStatusName } from '@karrkarr/shared';
 
 export function formatDate(iso: string | null | undefined): string {
   if (!iso) return '—';
