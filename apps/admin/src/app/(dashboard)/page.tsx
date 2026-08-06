@@ -7,7 +7,7 @@ import { StatCard } from '@/components/ui/StatCard';
 import { PageSkeleton } from '@/components/ui/Skeleton';
 import { MoneyCell } from '@/components/ui/MoneyCell';
 import { cn, formatDate } from '@/lib/utils';
-import type { FleetOverview } from '@vida/shared';
+import type { FleetOverview } from '@karrkarr/shared';
 
 interface AttentionItem {
   id: string;
