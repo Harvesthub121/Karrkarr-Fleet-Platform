@@ -69,7 +69,7 @@ export const POLICY_KEYS = {
   SUPPORT_EMAIL: 'support.email',
   SUPPORT_PHONE: 'support.phone',
 
-  // --- Tax (unused: Vida Partners is NOT GST-registered) --------------------
+  // --- Tax (unused: Karrkarr is NOT GST-registered) --------------------
   /** Kept at 0 so GST registration later is a settings change, not a rewrite. */
   TAX_RATE_BPS: 'tax.rateBps',
   TAX_REGISTERED: 'tax.registered',
@@ -112,17 +112,17 @@ export const POLICY_DEFAULTS: Record<PolicyKey, string> = {
   [POLICY_KEYS.RISK_WEIGHT_REJECTED_COUNT]: '8',
   [POLICY_KEYS.RISK_LOOKBACK_MONTHS]: '12',
 
-  [POLICY_KEYS.COMPANY_NAME]: 'Vida Partners Pte Ltd',
+  [POLICY_KEYS.COMPANY_NAME]: 'Karrkarr Pte Ltd',
   [POLICY_KEYS.COMPANY_UEN]: '202512345K',
   [POLICY_KEYS.PAYNOW_UEN]: '202512345K',
-  [POLICY_KEYS.PAYNOW_MERCHANT_NAME]: 'VIDA PARTNERS PTE LTD',
+  [POLICY_KEYS.PAYNOW_MERCHANT_NAME]: 'KARRKARR PTE LTD',
   [POLICY_KEYS.BANK_NAME]: 'DBS Bank Ltd',
-  [POLICY_KEYS.BANK_ACCOUNT_NAME]: 'Vida Partners Pte Ltd',
+  [POLICY_KEYS.BANK_ACCOUNT_NAME]: 'Karrkarr Pte Ltd',
   [POLICY_KEYS.BANK_ACCOUNT_NUMBER]: '003-901234-5',
   [POLICY_KEYS.BANK_SWIFT]: 'DBSSSGSG',
-  [POLICY_KEYS.ROADSIDE_ASSIST_NAME]: 'Vida 24/7 Roadside Assistance',
+  [POLICY_KEYS.ROADSIDE_ASSIST_NAME]: 'Karrkarr 24/7 Roadside Assistance',
   [POLICY_KEYS.ROADSIDE_ASSIST_PHONE]: '+65 6100 2424',
-  [POLICY_KEYS.SUPPORT_EMAIL]: 'support@vidapartners.com.sg',
+  [POLICY_KEYS.SUPPORT_EMAIL]: 'support@karrkarr.com.sg',
   [POLICY_KEYS.SUPPORT_PHONE]: '+65 6100 8888',
 
   [POLICY_KEYS.TAX_RATE_BPS]: '0',
