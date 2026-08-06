@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { hasPermission, PERMISSIONS, ROLE_PERMISSIONS } from '@vida/shared';
+import { hasPermission, PERMISSIONS, ROLE_PERMISSIONS } from '@karrkarr/shared';
 
 describe('RBAC matrix', () => {
   // ── OPERATIONS cannot approve money ──────────────────────────────────────
