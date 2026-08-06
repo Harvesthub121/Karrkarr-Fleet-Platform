@@ -1,0 +1,24 @@
+{
+  "name": "vida-fleet",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Vida Partners Pte Ltd — Fleet Leasing Management Platform",
+  "packageManager": "pnpm@9.12.0",
+  "engines": { "node": ">=20.11.0" },
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "lint": "pnpm -r lint",
+    "db:up": "docker compose -f infra/docker-compose.yml up -d postgres redis",
+    "db:migrate": "pnpm --filter @vida/api prisma:migrate",
+    "db:seed": "pnpm --filter @vida/api prisma:seed",
+    "db:studio": "pnpm --filter @vida/api prisma:studio",
+    "bootstrap": "pnpm install && pnpm db:up && sleep 5 && pnpm db:migrate && pnpm db:seed"
+  },
+  "devDependencies": {
+    "prettier": "^3.3.3",
+    "typescript": "^5.6.3"
+  }
+}
