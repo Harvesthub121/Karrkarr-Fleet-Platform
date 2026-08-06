@@ -1,6 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { POLICY_DEFAULTS, type PolicyKey } from '@vida/shared';
+import { POLICY_DEFAULTS, type PolicyKey } from '@karrkarr/shared';
 
 // ---------------------------------------------------------------------------
 // PolicyService
@@ -10,7 +10,7 @@ import { POLICY_DEFAULTS, type PolicyKey } from '@vida/shared';
 //      on RentalAgreement — handled inline by billing engine)
 //   2. Branch-level PolicySetting (branchId IS NOT NULL)
 //   3. Global PolicySetting (branchId IS NULL)
-//   4. POLICY_DEFAULTS from @vida/shared (compile-time safety net)
+//   4. POLICY_DEFAULTS from @karrkarr/shared (compile-time safety net)
 //
 // Cache design:
 //   - We cache ALL active settings at startup and invalidate on every write.
