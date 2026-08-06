@@ -11,7 +11,7 @@ import { ReportsService } from './reports.service';
 import { RequirePermissions } from '../auth/decorators/require-permissions.decorator';
 import { AdminJwtGuard } from '../auth/guards/admin-jwt.guard';
 import { PermissionsGuard } from '../auth/guards/permissions.guard';
-import { PERMISSIONS } from '@vida/shared';
+import { PERMISSIONS } from '@karrkarr/shared';
 
 type ExportFormat = 'json' | 'csv' | 'excel' | 'pdf';
 
