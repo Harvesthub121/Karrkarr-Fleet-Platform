@@ -12,7 +12,7 @@ import { AdminJwtGuard } from '../auth/guards/admin-jwt.guard';
 import { PermissionsGuard } from '../auth/guards/permissions.guard';
 import { RequirePermissions } from '../auth/decorators/require-permissions.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { PERMISSIONS } from '@vida/shared';
+import { PERMISSIONS } from '@karrkarr/shared';
 import type { AdminJwtPayload } from '../auth/strategies/admin-jwt.strategy';
 
 @ApiTags('vehicles')
