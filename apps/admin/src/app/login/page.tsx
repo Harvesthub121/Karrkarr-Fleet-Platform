@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { apiPost } from '@/lib/api-client';
-import type { AuthedAdmin, AuthTokens } from '@vida/shared';
+import type { AuthedAdmin, AuthTokens } from '@karrkarr/shared';
 import { cn } from '@/lib/utils';
 
 interface LoginResponse {
@@ -28,9 +28,9 @@ export default function LoginPage() {
     try {
       const res = await apiPost<LoginResponse>('/auth/admin/login', { email, password });
       // The API sets httpOnly cookies; store a flag for middleware
-      document.cookie = 'vida_authed=1; path=/; SameSite=Lax';
+      document.cookie = 'karrkarr_authed=1; path=/; SameSite=Lax';
       // Persist user role for client-side permission gating
-      sessionStorage.setItem('vida_admin_session', JSON.stringify(res.admin));
+      sessionStorage.setItem('karrkarr_admin_session', JSON.stringify(res.admin));
 
       // Role-aware redirect
       const admin = res.admin;
@@ -59,7 +59,7 @@ export default function LoginPage() {
             </svg>
           </div>
           <div>
-            <p className="text-white text-sm font-semibold tracking-tight">Vida Fleet</p>
+            <p className="text-white text-sm font-semibold tracking-tight">Karrkarr Fleet</p>
             <p className="text-zinc-500 text-2xs">Operations Dashboard</p>
           </div>
         </div>
@@ -76,7 +76,7 @@ export default function LoginPage() {
               value={email}
               onChange={e => setEmail(e.target.value)}
               className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-sm text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-teal-500 transition-colors"
-              placeholder="you@vidasg.com"
+              placeholder="you@karrkarr.com.sg"
             />
           </div>
           <div>
@@ -114,7 +114,7 @@ export default function LoginPage() {
         </form>
 
         <p className="mt-6 text-center text-2xs text-zinc-600">
-          Vida Partners Pte Ltd &mdash; Internal use only
+          Karrkarr Pte Ltd &mdash; Internal use only
         </p>
       </div>
     </div>
