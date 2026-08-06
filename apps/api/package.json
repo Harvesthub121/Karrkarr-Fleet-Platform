@@ -1,5 +1,5 @@
 {
-  "name": "@vida/api",
+  "name": "@karrkarr/api",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -26,7 +26,7 @@
     "@nestjs/schedule": "^4.1.0",
     "@nestjs/swagger": "^7.4.0",
     "@prisma/client": "^5.19.1",
-    "@vida/shared": "workspace:*",
+    "@karrkarr/shared": "workspace:*",
     "bcrypt": "^5.1.1",
     "bullmq": "^5.12.12",
     "class-transformer": "^0.5.1",
