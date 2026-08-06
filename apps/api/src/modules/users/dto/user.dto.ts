@@ -5,7 +5,7 @@ import {
 import { AdminRole } from '@prisma/client';
 
 export class CreateAdminUserDto {
-  @ApiProperty({ example: 'ops@vidapartners.com.sg' })
+  @ApiProperty({ example: 'ops@karrkarr.com.sg' })
   @IsEmail()
   email!: string;
 
