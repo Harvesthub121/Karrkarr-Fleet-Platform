@@ -13,7 +13,7 @@ import type {
   AuthTokens,
   AuthedCustomer,
   InvoiceStatusName,
-} from '@vida/shared';
+} from '@karrkarr/shared';
 
 // ─── Types returned by the portal-specific endpoints ─────────────────────────
 
