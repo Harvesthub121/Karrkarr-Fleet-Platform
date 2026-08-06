@@ -19,7 +19,7 @@ export const PASSWORD_MESSAGE =
   'Password must be at least 12 characters and include an uppercase letter, a lowercase letter, a number and a symbol.';
 
 export class AdminLoginDto {
-  @ApiProperty({ example: 'ops@vidapartners.com.sg' })
+  @ApiProperty({ example: 'ops@karrkarr.com.sg' })
   @IsEmail()
   email!: string;
 
