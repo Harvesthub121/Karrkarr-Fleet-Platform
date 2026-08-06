@@ -1,14 +1,14 @@
 /**
  * CollectionsService — powers the Collections Dashboard.
  *
- * All ageing uses ageingBucket() from @vida/shared which is consistent
+ * All ageing uses ageingBucket() from @karrkarr/shared which is consistent
  * with the interest accrual job's notion of "today".
  */
 
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { NotificationService } from '../notifications/notification.service';
-import { ageingBucket, formatSgd, daysOverdue } from '@vida/shared';
+import { ageingBucket, formatSgd, daysOverdue } from '@karrkarr/shared';
 import { NotificationChannel } from '@prisma/client';
 
 @Injectable()
