@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { Suspense, useState, type FormEvent } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { apiPost } from '@/lib/api-client';
 import type { AuthedAdmin, AuthTokens } from '@karrkarr/shared';
@@ -11,7 +11,12 @@ interface LoginResponse {
   admin: AuthedAdmin;
 }
 
-export default function LoginPage() {
+// useSearchParams() opts this subtree out of static rendering, so Next.js
+// requires it to sit behind a Suspense boundary — otherwise `next build`
+// fails when prerendering /login. The form is the only part that needs the
+// query string (the ?redirect= target after login), so it's the only part
+// wrapped here; everything static stays outside the boundary.
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get('redirect') ?? '/';
@@ -49,6 +54,59 @@ export default function LoginPage() {
   }
 
   return (
+    <form onSubmit={handleSubmit} className="space-y-3">
+      <div>
+        <label className="block text-2xs font-medium text-zinc-400 uppercase tracking-wide mb-1">
+          Email
+        </label>
+        <input
+          type="email"
+          required
+          autoFocus
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-sm text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-teal-500 transition-colors"
+          placeholder="you@karrkarr.com.sg"
+        />
+      </div>
+      <div>
+        <label className="block text-2xs font-medium text-zinc-400 uppercase tracking-wide mb-1">
+          Password
+        </label>
+        <input
+          type="password"
+          required
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-sm text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-teal-500 transition-colors"
+          placeholder="••••••••"
+        />
+      </div>
+
+      {error && (
+        <p className="text-xs text-red-400 bg-red-950/50 border border-red-900/50 rounded-sm px-3 py-2">
+          {error}
+        </p>
+      )}
+
+      <button
+        type="submit"
+        disabled={loading}
+        className={cn(
+          'w-full py-2 px-4 rounded-sm text-sm font-medium text-white transition-colors',
+          loading
+            ? 'bg-teal-700 cursor-not-allowed'
+            : 'bg-teal-500 hover:bg-teal-600 active:bg-teal-700',
+        )}
+      >
+        {loading ? 'Signing in…' : 'Sign in'}
+      </button>
+    </form>
+  );
+}
+
+export default function LoginPage() {
+  return (
     <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         {/* Logo */}
@@ -64,54 +122,9 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-3">
-          <div>
-            <label className="block text-2xs font-medium text-zinc-400 uppercase tracking-wide mb-1">
-              Email
-            </label>
-            <input
-              type="email"
-              required
-              autoFocus
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-sm text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-teal-500 transition-colors"
-              placeholder="you@karrkarr.com.sg"
-            />
-          </div>
-          <div>
-            <label className="block text-2xs font-medium text-zinc-400 uppercase tracking-wide mb-1">
-              Password
-            </label>
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-sm text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-teal-500 transition-colors"
-              placeholder="••••••••"
-            />
-          </div>
-
-          {error && (
-            <p className="text-xs text-red-400 bg-red-950/50 border border-red-900/50 rounded-sm px-3 py-2">
-              {error}
-            </p>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className={cn(
-              'w-full py-2 px-4 rounded-sm text-sm font-medium text-white transition-colors',
-              loading
-                ? 'bg-teal-700 cursor-not-allowed'
-                : 'bg-teal-500 hover:bg-teal-600 active:bg-teal-700',
-            )}
-          >
-            {loading ? 'Signing in…' : 'Sign in'}
-          </button>
-        </form>
+        <Suspense fallback={<div className="h-48" />}>
+          <LoginForm />
+        </Suspense>
 
         <p className="mt-6 text-center text-2xs text-zinc-600">
           Karrkarr Pte Ltd &mdash; Internal use only
