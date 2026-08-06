@@ -24,7 +24,7 @@ export class EmailAdapter implements NotificationChannelAdapter {
     private readonly config: ConfigService,
     private readonly prisma: PrismaService,
   ) {
-    this.fromAddress = config.get('RESEND_FROM_ADDRESS', 'noreply@vidapartners.com.sg');
+    this.fromAddress = config.get('RESEND_FROM_ADDRESS', 'noreply@karrkarr.com.sg');
     this.resendApiKey = config.get('RESEND_API_KEY', '');
   }
 
