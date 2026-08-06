@@ -11,11 +11,11 @@ terraform {
   # Uncomment and configure for team use. S3 bucket and DynamoDB table must
   # be created manually before first terraform init.
   # backend "s3" {
-  #   bucket         = "vida-fleet-tfstate"
+  #   bucket         = "karrkarr-fleet-tfstate"
   #   key            = "prod/terraform.tfstate"
   #   region         = "ap-southeast-1"
   #   encrypt        = true
-  #   dynamodb_table = "vida-fleet-tflock"
+  #   dynamodb_table = "karrkarr-fleet-tflock"
   # }
 }
 
