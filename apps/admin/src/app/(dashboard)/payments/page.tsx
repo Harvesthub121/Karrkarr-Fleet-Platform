@@ -7,7 +7,7 @@ import { MoneyCents } from '@/components/ui/MoneyCell';
 import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/Toast';
 import { Can } from '@/lib/permissions';
-import { PERMISSIONS } from '@vida/shared';
+import { PERMISSIONS } from '@karrkarr/shared';
 import { cn, formatDate } from '@/lib/utils';
 
 interface PaymentSubmission {
