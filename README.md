@@ -1,6 +1,6 @@
-# Vida Partners Fleet Leasing Platform
+# Karrkarr Fleet Leasing Platform
 
-Fleet management system for Vida Partners Pte Ltd, a Singapore car leasing company operating out of three branches (Ubi, Tuas, Woodlands). Manages ~500 vehicles, customer accounts, rental agreements, billing, collections, and fleet compliance.
+Fleet management system for Karrkarr Pte Ltd, a Singapore car leasing company operating out of three branches (Ubi, Tuas, Woodlands). Manages ~500 vehicles, customer accounts, rental agreements, billing, collections, and fleet compliance.
 
 ## Quickstart
 
@@ -25,22 +25,22 @@ Or as a single command: `pnpm bootstrap && pnpm dev`
 
 ## Demo Login Credentials
 
-All seed passwords are `Vida@2026!`. Change before any external access.
+All seed passwords are `Karrkarr@2026!`. Change before any external access.
 
 | Role            | Email                              | Scope         |
 |-----------------|------------------------------------|---------------|
-| SUPER_ADMIN     | super@vidapartners.com.sg          | All branches  |
-| OPERATIONS      | ops@vidapartners.com.sg            | Ubi branch    |
-| ACCOUNTS        | accounts@vidapartners.com.sg       | All branches  |
-| BRANCH_MANAGER  | branch@vidapartners.com.sg         | Ubi branch    |
-| VIEWER          | viewer@vidapartners.com.sg         | All branches  |
+| SUPER_ADMIN     | super@karrkarr.com.sg          | All branches  |
+| OPERATIONS      | ops@karrkarr.com.sg            | Ubi branch    |
+| ACCOUNTS        | accounts@karrkarr.com.sg       | All branches  |
+| BRANCH_MANAGER  | branch@karrkarr.com.sg         | Ubi branch    |
+| VIEWER          | viewer@karrkarr.com.sg         | All branches  |
 
 Customer accounts in the seed do not have passwords set (they are in the pre-activation state). Invite one from the admin dashboard to test the portal flow.
 
 ## Repo Layout
 
 ```
-vida-fleet/
+karrkarr-fleet/
 ├── apps/
 │   ├── api/                   NestJS REST API (port 3000)
 │   │   ├── prisma/            schema.prisma, seed.ts, migrations/
@@ -108,7 +108,7 @@ vida-fleet/
 
 **Money is BigInt cents.** All monetary values are stored as integer cents in PostgreSQL `BIGINT` columns. Floating point never touches a billing path. See `packages/shared/src/money.ts`.
 
-**Balances are derived, not stored.** `LedgerEntry` is the single source of truth. `Invoice.outstandingCents` and `RentalAgreement.depositBalanceCents` are denormalised caches updated in the same database transaction as the ledger write. If they ever disagree with the ledger, the ledger wins. A reconcile command exists: `pnpm --filter @vida/api ledger:reconcile`.
+**Balances are derived, not stored.** `LedgerEntry` is the single source of truth. `Invoice.outstandingCents` and `RentalAgreement.depositBalanceCents` are denormalised caches updated in the same database transaction as the ledger write. If they ever disagree with the ledger, the ledger wins. A reconcile command exists: `pnpm --filter @karrkarr/api ledger:reconcile`.
 
 **Branch is the tenancy boundary.** PrismaService installs middleware that injects a `branchId` filter for scoped roles. A forgotten `where` clause cannot leak cross-branch data.
 
@@ -149,7 +149,7 @@ vida-fleet/
 | DNS cutover                   | Client's registrar, see go-live checklist               |
 | Customer portal domain        | Vercel/Amplify project settings                         |
 
-Vida Partners is **not GST-registered**. There are no tax lines anywhere in the billing engine. The schema has a `tax.rateBps` policy key set to `0` as a placeholder so GST registration later requires only a settings change and an invoice template update, not a migration.
+Karrkarr is **not GST-registered**. There are no tax lines anywhere in the billing engine. The schema has a `tax.rateBps` policy key set to `0` as a placeholder so GST registration later requires only a settings change and an invoice template update, not a migration.
 
 Deposit refund/disbursement is **out of scope**. Deposits are received and tracked. The end-of-rental refund workflow does not exist. See `docs/EXTENSIONS.md`.
 
