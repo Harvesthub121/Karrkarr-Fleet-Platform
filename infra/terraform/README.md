@@ -1,6 +1,6 @@
-# Terraform — Vida Fleet AWS Infrastructure
+# Terraform — Karrkarr Fleet AWS Infrastructure
 
-Creates the full AWS infrastructure for the Vida Partners Fleet Leasing Platform in `ap-southeast-1`.
+Creates the full AWS infrastructure for the Karrkarr Fleet Leasing Platform in `ap-southeast-1`.
 
 ## What This Creates
 
@@ -33,16 +33,16 @@ terraform init
 # Review what will be created (safe, no changes)
 terraform plan \
   -var="db_password=<strong-password>" \
-  -var="domain_name=vidapartners.com.sg" \
-  -var="api_image_uri=<ecr-uri>/vida-api:latest" \
-  -var="worker_image_uri=<ecr-uri>/vida-api:latest"
+  -var="domain_name=karrkarr.com.sg" \
+  -var="api_image_uri=<ecr-uri>/karrkarr-api:latest" \
+  -var="worker_image_uri=<ecr-uri>/karrkarr-api:latest"
 
 # Create all resources
 terraform apply \
   -var="db_password=<strong-password>" \
-  -var="domain_name=vidapartners.com.sg" \
-  -var="api_image_uri=<ecr-uri>/vida-api:latest" \
-  -var="worker_image_uri=<ecr-uri>/vida-api:latest"
+  -var="domain_name=karrkarr.com.sg" \
+  -var="api_image_uri=<ecr-uri>/karrkarr-api:latest" \
+  -var="worker_image_uri=<ecr-uri>/karrkarr-api:latest"
 ```
 
 After apply, note the outputs. Then populate Secrets Manager values before starting ECS tasks.
@@ -52,27 +52,27 @@ After apply, note the outputs. Then populate Secrets Manager values before start
 ```bash
 # DATABASE_URL
 aws secretsmanager put-secret-value \
-  --secret-id vida-fleet-prod/DATABASE_URL \
-  --secret-string "postgresql://vida:<password>@<rds-endpoint>:5432/vida_fleet?schema=public&sslmode=require"
+  --secret-id karrkarr-fleet-prod/DATABASE_URL \
+  --secret-string "postgresql://karrkarr:<password>@<rds-endpoint>:5432/karrkarr_fleet?schema=public&sslmode=require"
 
 # JWT_ADMIN_SECRET (generate a strong random value)
 aws secretsmanager put-secret-value \
-  --secret-id vida-fleet-prod/JWT_ADMIN_SECRET \
+  --secret-id karrkarr-fleet-prod/JWT_ADMIN_SECRET \
   --secret-string "$(openssl rand -hex 64)"
 
 # JWT_CUSTOMER_SECRET
 aws secretsmanager put-secret-value \
-  --secret-id vida-fleet-prod/JWT_CUSTOMER_SECRET \
+  --secret-id karrkarr-fleet-prod/JWT_CUSTOMER_SECRET \
   --secret-string "$(openssl rand -hex 64)"
 
 # REDIS_URL (from terraform output)
 aws secretsmanager put-secret-value \
-  --secret-id vida-fleet-prod/REDIS_URL \
+  --secret-id karrkarr-fleet-prod/REDIS_URL \
   --secret-string "redis://<elasticache-endpoint>:6379"
 
 # RESEND_API_KEY (from Resend dashboard)
 aws secretsmanager put-secret-value \
-  --secret-id vida-fleet-prod/RESEND_API_KEY \
+  --secret-id karrkarr-fleet-prod/RESEND_API_KEY \
   --secret-string "re_xxxx"
 ```
 
@@ -90,9 +90,9 @@ To destroy for real (non-production only):
 Uncomment the `backend "s3"` block in `main.tf` for team use. Create the S3 bucket and DynamoDB table first:
 
 ```bash
-aws s3 mb s3://vida-fleet-tfstate --region ap-southeast-1
+aws s3 mb s3://karrkarr-fleet-tfstate --region ap-southeast-1
 aws dynamodb create-table \
-  --table-name vida-fleet-tflock \
+  --table-name karrkarr-fleet-tflock \
   --attribute-definitions AttributeName=LockID,AttributeType=S \
   --key-schema AttributeName=LockID,KeyType=HASH \
   --billing-mode PAY_PER_REQUEST \
