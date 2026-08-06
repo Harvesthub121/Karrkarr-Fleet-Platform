@@ -127,7 +127,7 @@ This document maps each planned future feature to the specific extension seam in
 
 **Approach:** A nightly or real-time sync job that pushes verified payments and issued invoices to Xero via their API. Map `LedgerEntryType` to Xero account codes.
 
-**Effort:** 2–3 weeks. Xero API is well-documented. The main complexity is initial chart-of-accounts mapping with Vida's accountant.
+**Effort:** 2–3 weeks. Xero API is well-documented. The main complexity is initial chart-of-accounts mapping with Karrkarr's accountant.
 
 **Sequencing:** After the first month of live operation, when the accountant needs to reconcile.
 
