@@ -8,7 +8,7 @@ import { VehicleStatusBadge } from '@/components/ui/StatusBadge';
 import { DateChip } from '@/components/ui/DateChip';
 import { useToast } from '@/components/ui/Toast';
 import { cn, daysFromNow } from '@/lib/utils';
-import type { VehicleStatusName } from '@vida/shared';
+import type { VehicleStatusName } from '@karrkarr/shared';
 
 interface VehicleRow {
   id: string;
