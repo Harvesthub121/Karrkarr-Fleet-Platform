@@ -38,7 +38,7 @@ resource "aws_ecs_task_definition" "api" {
   task_role_arn            = aws_iam_role.api_task.arn
 
   container_definitions = jsonencode([{
-    name      = "vida-api"
+    name      = "karrkarr-api"
     image     = var.api_image_uri
     essential = true
 
@@ -108,7 +108,7 @@ resource "aws_ecs_service" "api" {
 
   load_balancer {
     target_group_arn = aws_lb_target_group.api.arn
-    container_name   = "vida-api"
+    container_name   = "karrkarr-api"
     container_port   = 3000
   }
 
@@ -136,7 +136,7 @@ resource "aws_ecs_task_definition" "worker" {
   task_role_arn            = aws_iam_role.worker_task.arn
 
   container_definitions = jsonencode([{
-    name      = "vida-worker"
+    name      = "karrkarr-worker"
     image     = var.worker_image_uri
     essential = true
 
