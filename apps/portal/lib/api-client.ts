@@ -1,5 +1,5 @@
 /**
- * Typed fetch wrapper for the Vida Partners customer portal.
+ * Typed fetch wrapper for the Karrkarr customer portal.
  *
  * Token lifecycle:
  *  - Access token is stored server-side in an httpOnly cookie via the
