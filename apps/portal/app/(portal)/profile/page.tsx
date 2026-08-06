@@ -4,7 +4,7 @@ import { CardSkeleton } from '@/components/ui/Skeleton';
 import { ProfileForm } from './ProfileForm';
 import { ChangePasswordForm } from './ChangePasswordForm';
 
-export const metadata = { title: 'Profile — Vida Partners Portal' };
+export const metadata = { title: 'Profile — Karrkarr Portal' };
 
 async function ProfileContent() {
   const session = await getSession();
