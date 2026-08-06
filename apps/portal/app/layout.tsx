@@ -9,7 +9,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'Vida Partners — Customer Portal',
+  title: 'Karrkarr — Customer Portal',
   description: 'Manage your car rental, payments and documents.',
 };
 
