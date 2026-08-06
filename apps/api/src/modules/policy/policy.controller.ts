@@ -6,9 +6,9 @@ import { AdminJwtGuard } from '../auth/guards/admin-jwt.guard';
 import { PermissionsGuard } from '../auth/guards/permissions.guard';
 import { RequirePermissions } from '../auth/decorators/require-permissions.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { PERMISSIONS, POLICY_DEFAULTS } from '@vida/shared';
+import { PERMISSIONS, POLICY_DEFAULTS } from '@karrkarr/shared';
 import type { AdminJwtPayload } from '../auth/strategies/admin-jwt.strategy';
-import type { PolicyKey } from '@vida/shared';
+import type { PolicyKey } from '@karrkarr/shared';
 
 @ApiTags('policy')
 @ApiBearerAuth('AdminJWT')
