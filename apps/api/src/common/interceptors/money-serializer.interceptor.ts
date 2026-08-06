@@ -1,6 +1,6 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
 import { Observable, map } from 'rxjs';
-import { formatSgd } from '@vida/shared';
+import { formatSgd } from '@karrkarr/shared';
 
 /**
  * Money Serialiser Interceptor
