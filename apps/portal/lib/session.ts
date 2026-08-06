@@ -18,7 +18,7 @@ export interface SessionPayload {
   refreshToken: string;
 }
 
-const COOKIE_NAME = process.env.COOKIE_NAME ?? 'vida_portal_session';
+const COOKIE_NAME = process.env.COOKIE_NAME ?? 'karrkarr_portal_session';
 const SECRET_RAW = process.env.SESSION_SECRET ?? 'dev-secret-change-in-production-32ch';
 
 function getSecret(): Uint8Array {
