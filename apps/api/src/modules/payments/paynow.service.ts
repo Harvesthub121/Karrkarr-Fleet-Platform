@@ -10,7 +10,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { PolicyService } from '../policy/policy.service';
-import { buildPayNowPayload, POLICY_KEYS } from '@vida/shared';
+import { buildPayNowPayload, POLICY_KEYS } from '@karrkarr/shared';
 // qrcode is a runtime dep we assume is installed; types via @types/qrcode
 // import QRCode from 'qrcode';
 
