@@ -50,7 +50,7 @@
 ## Request Lifecycle
 
 1. Request arrives at NestJS. `RequestContextMiddleware` attaches a correlation ID and the raw `branchId` claim from the JWT if present.
-2. `AdminJwtGuard` or `CustomerJwtGuard` validates the access token against the appropriate secret and audience (`vida:admin` or `vida:customer`). Expired tokens are rejected with 401.
+2. `AdminJwtGuard` or `CustomerJwtGuard` validates the access token against the appropriate secret and audience (`karrkarr:admin` or `karrkarr:customer`). Expired tokens are rejected with 401.
 3. `PermissionsGuard` reads the `@RequirePermissions()` decorator on the handler and checks `ROLE_PERMISSIONS[role]` from `packages/shared/src/rbac.ts`. Rejected with 403.
 4. For branch-scoped roles, `CustomerScopeGuard` (customers) or the PrismaService middleware verifies the requested resource belongs to the caller's branch.
 5. The handler executes. Money-moving handlers call services that write to `LedgerEntry` and update denormalised caches in a single Prisma transaction.
@@ -93,7 +93,7 @@ SUPER_ADMIN and head-office roles with `branchId = null` on their AdminUser reco
 
 ### Dual-Audience JWT
 
-Admin and customer tokens are issued with separate JWT secrets and separate `aud` claims (`vida:admin`, `vida:customer`). `AdminJwtGuard` rejects customer tokens and vice versa. The strategies live in:
+Admin and customer tokens are issued with separate JWT secrets and separate `aud` claims (`karrkarr:admin`, `karrkarr:customer`). `AdminJwtGuard` rejects customer tokens and vice versa. The strategies live in:
 - `modules/auth/strategies/admin-jwt.strategy.ts`
 - `modules/auth/strategies/customer-jwt.strategy.ts`
 
