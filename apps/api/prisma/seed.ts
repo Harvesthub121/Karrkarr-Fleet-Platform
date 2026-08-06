@@ -1,7 +1,7 @@
 /**
- * Vida Partners Pte Ltd — Idempotent seed script.
+ * Karrkarr Pte Ltd — Idempotent seed script.
  *
- * Run: pnpm --filter @vida/api prisma:seed
+ * Run: pnpm --filter @karrkarr/api prisma:seed
  *
  * What it creates:
  *   - 3 Singapore branches (Ubi, Tuas, Woodlands)
@@ -22,7 +22,7 @@ import {
   firstAccrualDate,
   isoDate,
   toUtcMidnight,
-} from '@vida/shared';
+} from '@karrkarr/shared';
 
 const prisma = new PrismaClient();
 
@@ -48,23 +48,23 @@ function daysFromNow(n: number): Date {
 }
 
 async function main() {
-  console.log('Seeding Vida Partners Pte Ltd...');
+  console.log('Seeding Karrkarr Pte Ltd...');
 
   // ── Branches ────────────────────────────────────────────────────────────────
   const [ubi, tuas, woodlands] = await Promise.all([
     prisma.branch.upsert({
       where: { code: 'UBI' },
-      create: { code: 'UBI', name: 'Vida Ubi', address: '3018 Ubi Road 1, #01-111, Singapore 408702', postal: '408702', phone: '+65 6100 1111' },
+      create: { code: 'UBI', name: 'Karrkarr Ubi', address: '3018 Ubi Road 1, #01-111, Singapore 408702', postal: '408702', phone: '+65 6100 1111' },
       update: {},
     }),
     prisma.branch.upsert({
       where: { code: 'TUAS' },
-      create: { code: 'TUAS', name: 'Vida Tuas', address: '20 Tuas West Drive, Singapore 638386', postal: '638386', phone: '+65 6100 2222' },
+      create: { code: 'TUAS', name: 'Karrkarr Tuas', address: '20 Tuas West Drive, Singapore 638386', postal: '638386', phone: '+65 6100 2222' },
       update: {},
     }),
     prisma.branch.upsert({
       where: { code: 'WDL' },
-      create: { code: 'WDL', name: 'Vida Woodlands', address: '3 Woodlands Sector 1, Singapore 738349', postal: '738349', phone: '+65 6100 3333' },
+      create: { code: 'WDL', name: 'Karrkarr Woodlands', address: '3 Woodlands Sector 1, Singapore 738349', postal: '738349', phone: '+65 6100 3333' },
       update: {},
     }),
   ]);
@@ -73,28 +73,28 @@ async function main() {
   // ── Admin Users ─────────────────────────────────────────────────────────────
   await Promise.all([
     prisma.adminUser.upsert({
-      where: { email: 'super@vidapartners.com.sg' },
-      create: { email: 'super@vidapartners.com.sg', passwordHash: HASH('Vida@2026!'), fullName: 'Super Admin', role: 'SUPER_ADMIN', passwordChangedAt: new Date() },
+      where: { email: 'super@karrkarr.com.sg' },
+      create: { email: 'super@karrkarr.com.sg', passwordHash: HASH('Karrkarr@2026!'), fullName: 'Super Admin', role: 'SUPER_ADMIN', passwordChangedAt: new Date() },
       update: {},
     }),
     prisma.adminUser.upsert({
-      where: { email: 'ops@vidapartners.com.sg' },
-      create: { email: 'ops@vidapartners.com.sg', passwordHash: HASH('Vida@2026!'), fullName: 'Ops Officer', role: 'OPERATIONS', branchId: ubi.id, passwordChangedAt: new Date() },
+      where: { email: 'ops@karrkarr.com.sg' },
+      create: { email: 'ops@karrkarr.com.sg', passwordHash: HASH('Karrkarr@2026!'), fullName: 'Ops Officer', role: 'OPERATIONS', branchId: ubi.id, passwordChangedAt: new Date() },
       update: {},
     }),
     prisma.adminUser.upsert({
-      where: { email: 'accounts@vidapartners.com.sg' },
-      create: { email: 'accounts@vidapartners.com.sg', passwordHash: HASH('Vida@2026!'), fullName: 'Accounts Manager', role: 'ACCOUNTS', passwordChangedAt: new Date() },
+      where: { email: 'accounts@karrkarr.com.sg' },
+      create: { email: 'accounts@karrkarr.com.sg', passwordHash: HASH('Karrkarr@2026!'), fullName: 'Accounts Manager', role: 'ACCOUNTS', passwordChangedAt: new Date() },
       update: {},
     }),
     prisma.adminUser.upsert({
-      where: { email: 'branch@vidapartners.com.sg' },
-      create: { email: 'branch@vidapartners.com.sg', passwordHash: HASH('Vida@2026!'), fullName: 'Branch Manager Ubi', role: 'BRANCH_MANAGER', branchId: ubi.id, passwordChangedAt: new Date() },
+      where: { email: 'branch@karrkarr.com.sg' },
+      create: { email: 'branch@karrkarr.com.sg', passwordHash: HASH('Karrkarr@2026!'), fullName: 'Branch Manager Ubi', role: 'BRANCH_MANAGER', branchId: ubi.id, passwordChangedAt: new Date() },
       update: {},
     }),
     prisma.adminUser.upsert({
-      where: { email: 'viewer@vidapartners.com.sg' },
-      create: { email: 'viewer@vidapartners.com.sg', passwordHash: HASH('Vida@2026!'), fullName: 'Read-Only Viewer', role: 'VIEWER', passwordChangedAt: new Date() },
+      where: { email: 'viewer@karrkarr.com.sg' },
+      create: { email: 'viewer@karrkarr.com.sg', passwordHash: HASH('Karrkarr@2026!'), fullName: 'Read-Only Viewer', role: 'VIEWER', passwordChangedAt: new Date() },
       update: {},
     }),
   ]);
@@ -176,31 +176,31 @@ async function main() {
 
   // ── Customers ───────────────────────────────────────────────────────────────
   const customerData = [
-    { ref: 'VP-C-00001', email: 'tan.wei.ming@gmail.com', fullName: 'Tan Wei Ming', phone: '+6591234567', branchId: ubi.id },
-    { ref: 'VP-C-00002', email: 'lim.siew.khim@hotmail.com', fullName: 'Lim Siew Khim', phone: '+6592345678', branchId: ubi.id },
-    { ref: 'VP-C-00003', email: 'ng.chee.keong@yahoo.com', fullName: 'Ng Chee Keong', phone: '+6593456789', branchId: ubi.id },
-    { ref: 'VP-C-00004', email: 'goh.bee.leng@gmail.com', fullName: 'Goh Bee Leng', phone: '+6594567890', branchId: ubi.id },
-    { ref: 'VP-C-00005', email: 'koh.kim.hock@gmail.com', fullName: 'Koh Kim Hock', phone: '+6595678901', branchId: ubi.id },
-    { ref: 'VP-C-00006', email: 'chua.ah.kow@gmail.com', fullName: 'Chua Ah Kow', phone: '+6596789012', branchId: ubi.id },
-    { ref: 'VP-C-00007', email: 'yeo.mei.ling@outlook.com', fullName: 'Yeo Mei Ling', phone: '+6597890123', branchId: ubi.id },
-    { ref: 'VP-C-00008', email: 'ong.teck.boon@gmail.com', fullName: 'Ong Teck Boon', phone: '+6598901234', branchId: ubi.id },
-    { ref: 'VP-C-00009', email: 'seah.swee.hua@gmail.com', fullName: 'Seah Swee Hua', phone: '+6599012345', branchId: tuas.id },
-    { ref: 'VP-C-00010', email: 'lee.boon.seng@gmail.com', fullName: 'Lee Boon Seng', phone: '+6591122334', branchId: tuas.id },
-    { ref: 'VP-C-00011', email: 'wong.kah.mun@yahoo.com', fullName: 'Wong Kah Mun', phone: '+6592233445', branchId: tuas.id },
-    { ref: 'VP-C-00012', email: 'poh.geok.choo@gmail.com', fullName: 'Poh Geok Choo', phone: '+6593344556', branchId: tuas.id },
-    { ref: 'VP-C-00013', email: 'chong.ah.meng@hotmail.com', fullName: 'Chong Ah Meng', phone: '+6594455667', branchId: tuas.id },
-    { ref: 'VP-C-00014', email: 'lam.kwok.wai@gmail.com', fullName: 'Lam Kwok Wai', phone: '+6595566778', branchId: tuas.id },
-    { ref: 'VP-C-00015', email: 'fong.sau.yee@gmail.com', fullName: 'Fong Sau Yee', phone: '+6596677889', branchId: tuas.id },
-    { ref: 'VP-C-00016', email: 'ho.keng.wah@outlook.com', fullName: 'Ho Keng Wah', phone: '+6597788990', branchId: tuas.id },
-    { ref: 'VP-C-00017', email: 'teo.siew.lan@gmail.com', fullName: 'Teo Siew Lan', phone: '+6598899001', branchId: woodlands.id },
-    { ref: 'VP-C-00018', email: 'low.ah.chye@yahoo.com', fullName: 'Low Ah Chye', phone: '+6599900112', branchId: woodlands.id },
-    { ref: 'VP-C-00019', email: 'chan.lai.fun@gmail.com', fullName: 'Chan Lai Fun', phone: '+6591011223', branchId: woodlands.id },
-    { ref: 'VP-C-00020', email: 'wee.bock.kim@gmail.com', fullName: 'Wee Bock Kim', phone: '+6592122334', branchId: woodlands.id },
-    { ref: 'VP-C-00021', email: 'heng.swee.keat@gmail.com', fullName: 'Heng Swee Keat', phone: '+6593233445', branchId: woodlands.id },
-    { ref: 'VP-C-00022', email: 'quek.mui.hua@hotmail.com', fullName: 'Quek Mui Hua', phone: '+6594344556', branchId: woodlands.id },
-    { ref: 'VP-C-00023', email: 'sng.kian.siong@gmail.com', fullName: 'Sng Kian Siong', phone: '+6595455667', branchId: woodlands.id },
-    { ref: 'VP-C-00024', email: 'bong.tze.yong@outlook.com', fullName: 'Bong Tze Yong', phone: '+6596566778', branchId: woodlands.id },
-    { ref: 'VP-C-00025', email: 'ang.peng.teck@gmail.com', fullName: 'Ang Peng Teck', phone: '+6597677889', branchId: woodlands.id },
+    { ref: 'KR-C-00001', email: 'tan.wei.ming@gmail.com', fullName: 'Tan Wei Ming', phone: '+6591234567', branchId: ubi.id },
+    { ref: 'KR-C-00002', email: 'lim.siew.khim@hotmail.com', fullName: 'Lim Siew Khim', phone: '+6592345678', branchId: ubi.id },
+    { ref: 'KR-C-00003', email: 'ng.chee.keong@yahoo.com', fullName: 'Ng Chee Keong', phone: '+6593456789', branchId: ubi.id },
+    { ref: 'KR-C-00004', email: 'goh.bee.leng@gmail.com', fullName: 'Goh Bee Leng', phone: '+6594567890', branchId: ubi.id },
+    { ref: 'KR-C-00005', email: 'koh.kim.hock@gmail.com', fullName: 'Koh Kim Hock', phone: '+6595678901', branchId: ubi.id },
+    { ref: 'KR-C-00006', email: 'chua.ah.kow@gmail.com', fullName: 'Chua Ah Kow', phone: '+6596789012', branchId: ubi.id },
+    { ref: 'KR-C-00007', email: 'yeo.mei.ling@outlook.com', fullName: 'Yeo Mei Ling', phone: '+6597890123', branchId: ubi.id },
+    { ref: 'KR-C-00008', email: 'ong.teck.boon@gmail.com', fullName: 'Ong Teck Boon', phone: '+6598901234', branchId: ubi.id },
+    { ref: 'KR-C-00009', email: 'seah.swee.hua@gmail.com', fullName: 'Seah Swee Hua', phone: '+6599012345', branchId: tuas.id },
+    { ref: 'KR-C-00010', email: 'lee.boon.seng@gmail.com', fullName: 'Lee Boon Seng', phone: '+6591122334', branchId: tuas.id },
+    { ref: 'KR-C-00011', email: 'wong.kah.mun@yahoo.com', fullName: 'Wong Kah Mun', phone: '+6592233445', branchId: tuas.id },
+    { ref: 'KR-C-00012', email: 'poh.geok.choo@gmail.com', fullName: 'Poh Geok Choo', phone: '+6593344556', branchId: tuas.id },
+    { ref: 'KR-C-00013', email: 'chong.ah.meng@hotmail.com', fullName: 'Chong Ah Meng', phone: '+6594455667', branchId: tuas.id },
+    { ref: 'KR-C-00014', email: 'lam.kwok.wai@gmail.com', fullName: 'Lam Kwok Wai', phone: '+6595566778', branchId: tuas.id },
+    { ref: 'KR-C-00015', email: 'fong.sau.yee@gmail.com', fullName: 'Fong Sau Yee', phone: '+6596677889', branchId: tuas.id },
+    { ref: 'KR-C-00016', email: 'ho.keng.wah@outlook.com', fullName: 'Ho Keng Wah', phone: '+6597788990', branchId: tuas.id },
+    { ref: 'KR-C-00017', email: 'teo.siew.lan@gmail.com', fullName: 'Teo Siew Lan', phone: '+6598899001', branchId: woodlands.id },
+    { ref: 'KR-C-00018', email: 'low.ah.chye@yahoo.com', fullName: 'Low Ah Chye', phone: '+6599900112', branchId: woodlands.id },
+    { ref: 'KR-C-00019', email: 'chan.lai.fun@gmail.com', fullName: 'Chan Lai Fun', phone: '+6591011223', branchId: woodlands.id },
+    { ref: 'KR-C-00020', email: 'wee.bock.kim@gmail.com', fullName: 'Wee Bock Kim', phone: '+6592122334', branchId: woodlands.id },
+    { ref: 'KR-C-00021', email: 'heng.swee.keat@gmail.com', fullName: 'Heng Swee Keat', phone: '+6593233445', branchId: woodlands.id },
+    { ref: 'KR-C-00022', email: 'quek.mui.hua@hotmail.com', fullName: 'Quek Mui Hua', phone: '+6594344556', branchId: woodlands.id },
+    { ref: 'KR-C-00023', email: 'sng.kian.siong@gmail.com', fullName: 'Sng Kian Siong', phone: '+6595455667', branchId: woodlands.id },
+    { ref: 'KR-C-00024', email: 'bong.tze.yong@outlook.com', fullName: 'Bong Tze Yong', phone: '+6596566778', branchId: woodlands.id },
+    { ref: 'KR-C-00025', email: 'ang.peng.teck@gmail.com', fullName: 'Ang Peng Teck', phone: '+6597677889', branchId: woodlands.id },
   ];
 
   const customers: Record<string, string> = {}; // ref -> id
@@ -224,10 +224,10 @@ async function main() {
 
   // Ensure invoice sequence exists
   await prisma.$executeRawUnsafe(
-    `CREATE SEQUENCE IF NOT EXISTS vida_invoice_seq START 1 INCREMENT 1`,
+    `CREATE SEQUENCE IF NOT EXISTS karrkarr_invoice_seq START 1 INCREMENT 1`,
   );
   await prisma.$executeRawUnsafe(
-    `CREATE SEQUENCE IF NOT EXISTS vida_receipt_seq START 1 INCREMENT 1`,
+    `CREATE SEQUENCE IF NOT EXISTS karrkarr_receipt_seq START 1 INCREMENT 1`,
   );
 
   // ── Rentals + Invoices ──────────────────────────────────────────────────────
@@ -250,29 +250,29 @@ async function main() {
 
   const scenarios: RentalScenario[] = [
     // Healthy, upcoming invoice
-    { agreementNo: 'VP-R-2026-00001', customerRef: 'VP-C-00001', plate: 'SMR1337G', billingFrequency: 'MONTHLY', billingAnchorDay: 1, startDate: daysAgo(60), endDate: daysFromNow(300), rentAmountCents: 200000n, depositCents: 400000n, invoiceStatus: 'DUE', invoiceDueDaysAgo: 0 },
+    { agreementNo: 'KR-R-2026-00001', customerRef: 'KR-C-00001', plate: 'SMR1337G', billingFrequency: 'MONTHLY', billingAnchorDay: 1, startDate: daysAgo(60), endDate: daysFromNow(300), rentAmountCents: 200000n, depositCents: 400000n, invoiceStatus: 'DUE', invoiceDueDaysAgo: 0 },
     // Due today
-    { agreementNo: 'VP-R-2026-00002', customerRef: 'VP-C-00002', plate: 'SNA2288B', billingFrequency: 'WEEKLY', billingAnchorDay: 4, startDate: daysAgo(28), endDate: daysFromNow(60), rentAmountCents: 58000n, depositCents: 116000n, invoiceStatus: 'DUE', invoiceDueDaysAgo: 0 },
+    { agreementNo: 'KR-R-2026-00002', customerRef: 'KR-C-00002', plate: 'SNA2288B', billingFrequency: 'WEEKLY', billingAnchorDay: 4, startDate: daysAgo(28), endDate: daysFromNow(60), rentAmountCents: 58000n, depositCents: 116000n, invoiceStatus: 'DUE', invoiceDueDaysAgo: 0 },
     // 3 days overdue (within grace, no interest yet)
-    { agreementNo: 'VP-R-2026-00003', customerRef: 'VP-C-00003', plate: 'SKA5512T', billingFrequency: 'MONTHLY', billingAnchorDay: 15, startDate: daysAgo(45), endDate: daysFromNow(320), rentAmountCents: 185000n, depositCents: 370000n, invoiceStatus: 'OVERDUE', invoiceDueDaysAgo: 3 },
+    { agreementNo: 'KR-R-2026-00003', customerRef: 'KR-C-00003', plate: 'SKA5512T', billingFrequency: 'MONTHLY', billingAnchorDay: 15, startDate: daysAgo(45), endDate: daysFromNow(320), rentAmountCents: 185000n, depositCents: 370000n, invoiceStatus: 'OVERDUE', invoiceDueDaysAgo: 3 },
     // 5 days overdue (within grace)
-    { agreementNo: 'VP-R-2026-00004', customerRef: 'VP-C-00004', plate: 'SBK3301H', billingFrequency: 'WEEKLY', billingAnchorDay: 2, startDate: daysAgo(35), endDate: daysFromNow(150), rentAmountCents: 210000n, depositCents: 420000n, invoiceStatus: 'OVERDUE', invoiceDueDaysAgo: 5 },
+    { agreementNo: 'KR-R-2026-00004', customerRef: 'KR-C-00004', plate: 'SBK3301H', billingFrequency: 'WEEKLY', billingAnchorDay: 2, startDate: daysAgo(35), endDate: daysFromNow(150), rentAmountCents: 210000n, depositCents: 420000n, invoiceStatus: 'OVERDUE', invoiceDueDaysAgo: 5 },
     // 7 days overdue WITH interest (7-3=4 days of interest)
-    { agreementNo: 'VP-R-2026-00005', customerRef: 'VP-C-00005', plate: 'SDK7745U', billingFrequency: 'MONTHLY', billingAnchorDay: 1, startDate: daysAgo(38), endDate: daysFromNow(330), rentAmountCents: 230000n, depositCents: 460000n, invoiceStatus: 'OVERDUE', invoiceDueDaysAgo: 7, interestDaysToAccrue: 4 },
+    { agreementNo: 'KR-R-2026-00005', customerRef: 'KR-C-00005', plate: 'SDK7745U', billingFrequency: 'MONTHLY', billingAnchorDay: 1, startDate: daysAgo(38), endDate: daysFromNow(330), rentAmountCents: 230000n, depositCents: 460000n, invoiceStatus: 'OVERDUE', invoiceDueDaysAgo: 7, interestDaysToAccrue: 4 },
     // 1 day overdue (just crossed grace=3, no interest yet)
-    { agreementNo: 'VP-R-2026-00006', customerRef: 'VP-C-00006', plate: 'SFM2203C', billingFrequency: 'WEEKLY', billingAnchorDay: 5, startDate: daysAgo(22), endDate: daysFromNow(70), rentAmountCents: 200000n, depositCents: 400000n, invoiceStatus: 'OVERDUE', invoiceDueDaysAgo: 1 },
+    { agreementNo: 'KR-R-2026-00006', customerRef: 'KR-C-00006', plate: 'SFM2203C', billingFrequency: 'WEEKLY', billingAnchorDay: 5, startDate: daysAgo(22), endDate: daysFromNow(70), rentAmountCents: 200000n, depositCents: 400000n, invoiceStatus: 'OVERDUE', invoiceDueDaysAgo: 1 },
     // 20+ days overdue WITH significant interest
-    { agreementNo: 'VP-R-2026-00007', customerRef: 'VP-C-00007', plate: 'SGP4456K', billingFrequency: 'MONTHLY', billingAnchorDay: 10, startDate: daysAgo(50), endDate: daysFromNow(310), rentAmountCents: 220000n, depositCents: 440000n, invoiceStatus: 'OVERDUE', invoiceDueDaysAgo: 23, interestDaysToAccrue: 20 },
+    { agreementNo: 'KR-R-2026-00007', customerRef: 'KR-C-00007', plate: 'SGP4456K', billingFrequency: 'MONTHLY', billingAnchorDay: 10, startDate: daysAgo(50), endDate: daysFromNow(310), rentAmountCents: 220000n, depositCents: 440000n, invoiceStatus: 'OVERDUE', invoiceDueDaysAgo: 23, interestDaysToAccrue: 20 },
     // 25 days overdue
-    { agreementNo: 'VP-R-2026-00008', customerRef: 'VP-C-00008', plate: 'SHA3389P', billingFrequency: 'MONTHLY', billingAnchorDay: 5, startDate: daysAgo(56), endDate: daysFromNow(290), rentAmountCents: 190000n, depositCents: 380000n, invoiceStatus: 'OVERDUE', invoiceDueDaysAgo: 25, interestDaysToAccrue: 22 },
+    { agreementNo: 'KR-R-2026-00008', customerRef: 'KR-C-00008', plate: 'SHA3389P', billingFrequency: 'MONTHLY', billingAnchorDay: 5, startDate: daysAgo(56), endDate: daysFromNow(290), rentAmountCents: 190000n, depositCents: 380000n, invoiceStatus: 'OVERDUE', invoiceDueDaysAgo: 25, interestDaysToAccrue: 22 },
     // Partially paid
-    { agreementNo: 'VP-R-2026-00009', customerRef: 'VP-C-00009', plate: 'SNF2278E', billingFrequency: 'MONTHLY', billingAnchorDay: 20, startDate: daysAgo(40), endDate: daysFromNow(320), rentAmountCents: 240000n, depositCents: 480000n, invoiceStatus: 'PARTIALLY_PAID', invoiceDueDaysAgo: 10, interestDaysToAccrue: 7 },
+    { agreementNo: 'KR-R-2026-00009', customerRef: 'KR-C-00009', plate: 'SNF2278E', billingFrequency: 'MONTHLY', billingAnchorDay: 20, startDate: daysAgo(40), endDate: daysFromNow(320), rentAmountCents: 240000n, depositCents: 480000n, invoiceStatus: 'PARTIALLY_PAID', invoiceDueDaysAgo: 10, interestDaysToAccrue: 7 },
     // Pending verification
-    { agreementNo: 'VP-R-2026-00010', customerRef: 'VP-C-00010', plate: 'SPG3314R', billingFrequency: 'WEEKLY', billingAnchorDay: 1, startDate: daysAgo(21), endDate: daysFromNow(60), rentAmountCents: 195000n, depositCents: 390000n, invoiceStatus: 'PENDING_VERIFICATION', invoiceDueDaysAgo: 4 },
+    { agreementNo: 'KR-R-2026-00010', customerRef: 'KR-C-00010', plate: 'SPG3314R', billingFrequency: 'WEEKLY', billingAnchorDay: 1, startDate: daysAgo(21), endDate: daysFromNow(60), rentAmountCents: 195000n, depositCents: 390000n, invoiceStatus: 'PENDING_VERIFICATION', invoiceDueDaysAgo: 4 },
     // Paid
-    { agreementNo: 'VP-R-2026-00011', customerRef: 'VP-C-00011', plate: 'SQH4456Y', billingFrequency: 'MONTHLY', billingAnchorDay: 1, startDate: daysAgo(45), endDate: daysFromNow(315), rentAmountCents: 230000n, depositCents: 460000n, invoiceStatus: 'PAID', invoiceDueDaysAgo: -5 },
+    { agreementNo: 'KR-R-2026-00011', customerRef: 'KR-C-00011', plate: 'SQH4456Y', billingFrequency: 'MONTHLY', billingAnchorDay: 1, startDate: daysAgo(45), endDate: daysFromNow(315), rentAmountCents: 230000n, depositCents: 460000n, invoiceStatus: 'PAID', invoiceDueDaysAgo: -5 },
     // Upcoming
-    { agreementNo: 'VP-R-2026-00012', customerRef: 'VP-C-00012', plate: 'SRK5523B', billingFrequency: 'WEEKLY', billingAnchorDay: 3, startDate: daysAgo(10), endDate: daysFromNow(80), rentAmountCents: 188000n, depositCents: 376000n, invoiceStatus: 'UPCOMING', invoiceDueDaysAgo: -7 },
+    { agreementNo: 'KR-R-2026-00012', customerRef: 'KR-C-00012', plate: 'SRK5523B', billingFrequency: 'WEEKLY', billingAnchorDay: 3, startDate: daysAgo(10), endDate: daysFromNow(80), rentAmountCents: 188000n, depositCents: 376000n, invoiceStatus: 'UPCOMING', invoiceDueDaysAgo: -7 },
   ];
 
   for (const s of scenarios) {
@@ -336,8 +336,8 @@ async function main() {
 
     // Create invoice
     const invoiceNo = await prisma.$queryRaw<[{ nextval: bigint }]>(
-      prisma.$queryRaw`SELECT nextval('vida_invoice_seq')`,
-    ).then((r: [{ nextval: bigint }]) => `VP-INV-2026-${Number(r[0].nextval).toString().padStart(6, '0')}`);
+      prisma.$queryRaw`SELECT nextval('karrkarr_invoice_seq')`,
+    ).then((r: [{ nextval: bigint }]) => `KR-INV-2026-${Number(r[0].nextval).toString().padStart(6, '0')}`);
 
     const dueDate = daysAgo(s.invoiceDueDaysAgo);
     const issueDate = new Date(dueDate.getTime() - 7 * 86_400_000);
