@@ -1,7 +1,7 @@
 import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { PERMISSIONS_KEY } from '../decorators/require-permissions.decorator';
-import type { Permission } from '@vida/shared';
+import type { Permission } from '@karrkarr/shared';
 import type { AdminJwtPayload } from '../strategies/admin-jwt.strategy';
 
 /**
