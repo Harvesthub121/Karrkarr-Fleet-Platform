@@ -17,7 +17,7 @@ const BASE_STYLE = `
 
 const HEADER_HTML = `
   <div style="background: #1a365d; padding: 24px; text-align: center;">
-    <h1 style="color: #ffffff; margin: 0; font-size: 22px;">Vida Partners Pte Ltd</h1>
+    <h1 style="color: #ffffff; margin: 0; font-size: 22px;">Karrkarr Pte Ltd</h1>
     <p style="color: #a0aec0; margin: 4px 0 0; font-size: 13px;">Fleet Leasing Management</p>
   </div>
 `;
@@ -25,7 +25,7 @@ const HEADER_HTML = `
 const FOOTER_HTML = `
   <div style="background: #f7fafc; padding: 16px; text-align: center; border-top: 1px solid #e2e8f0;">
     <p style="color: #718096; font-size: 12px; margin: 0;">
-      Vida Partners Pte Ltd | support@vidapartners.com.sg | +65 6100 8888
+      Karrkarr Pte Ltd | support@karrkarr.com.sg | +65 6100 8888
     </p>
     <p style="color: #a0aec0; font-size: 11px; margin: 4px 0 0;">
       This is an automated notification. Please do not reply to this email.
