@@ -1,6 +1,6 @@
 # API Reference
 
-Base URL: `https://api.vidapartners.com.sg` (production) / `http://localhost:3000` (local)
+Base URL: `https://api.karrkarr.com.sg` (production) / `http://localhost:3000` (local)
 
 All admin endpoints require `Authorization: Bearer <admin_access_token>`.
 Customer portal endpoints require `Authorization: Bearer <customer_access_token>`.
@@ -23,7 +23,7 @@ No authentication required for login endpoints.
 
 **POST /auth/admin/login** body:
 ```json
-{ "email": "super@vidapartners.com.sg", "password": "Vida@2026!" }
+{ "email": "super@karrkarr.com.sg", "password": "Karrkarr@2026!" }
 ```
 
 Response:
