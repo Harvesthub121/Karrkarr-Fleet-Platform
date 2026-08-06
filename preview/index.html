@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vida Partners — Fleet Leasing Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --teal:#0F5D52; --teal-dk:#0A423A; --teal-lt:#E7F1EF;
+  --ink:#111614; --mut:#5F6B67; --faint:#8A9591;
+  --line:#E4E8E7; --bg:#F7F8F8; --white:#fff;
+  --green:#1B7F4C; --green-bg:#E8F5EE;
+  --amber:#B26A00; --amber-bg:#FDF3E3;
+  --orange:#C2540A; --orange-bg:#FDEDE1;
+  --red:#B3261E; --red-bg:#FCEBEA;
+}
+html{-webkit-font-smoothing:antialiased}
+body{font-family:Inter,system-ui,sans-serif;color:var(--ink);background:var(--bg);font-size:14px;line-height:1.5}
+.num{font-variant-numeric:tabular-nums}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+a{color:inherit}
+
+/* ---------- chrome ---------- */
+.topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:20px;
+  background:var(--white);border-bottom:1px solid var(--line);padding:0 20px;height:56px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:9px;font-weight:700;letter-spacing:-.02em;white-space:nowrap}
+.mark{width:24px;height:24px;border-radius:6px;background:var(--teal);display:grid;place-items:center;color:#fff;font-size:12px;font-weight:700}
+.brand small{display:block;font-size:10px;font-weight:500;color:var(--faint);letter-spacing:.04em;text-transform:uppercase}
+.appsw{display:flex;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:3px;gap:2px}
+.appsw button{padding:6px 13px;border-radius:6px;font-size:12.5px;font-weight:600;color:var(--mut)}
+.appsw button[aria-pressed=true]{background:var(--white);color:var(--teal);box-shadow:0 1px 2px rgba(0,0,0,.07)}
+.badge-demo{margin-left:auto;font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--amber);background:var(--amber-bg);border:1px solid #F0DDBB;padding:4px 9px;border-radius:99px}
+
+.shell{display:grid;grid-template-columns:216px 1fr;min-height:calc(100vh - 56px)}
+.side{background:#14201D;padding:14px 10px;display:flex;flex-direction:column;gap:2px}
+.side .grp{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#6F817C;padding:14px 10px 6px}
+.side button{display:flex;align-items:center;gap:9px;width:100%;text-align:left;padding:8px 10px;border-radius:7px;
+  color:#B9C6C2;font-size:13px;font-weight:500}
+.side button:hover{background:#1D2C28;color:#fff}
+.side button[aria-current=page]{background:var(--teal);color:#fff;font-weight:600}
+.side svg{width:15px;height:15px;flex:none;stroke:currentColor;fill:none;stroke-width:1.7}
+.side .who{margin-top:auto;border-top:1px solid #263531;padding:12px 10px 4px;color:#8B9A96;font-size:11.5px}
+.side .who b{display:block;color:#E6EDEB;font-size:12.5px;font-weight:600}
+
+.main{padding:24px 28px 64px;max-width:1320px}
+.phead{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+.phead h1{font-size:22px;font-weight:700;letter-spacing:-.025em}
+.phead p{color:var(--mut);font-size:13px;margin-top:3px}
+.filters{display:flex;gap:8px}
+.sel{border:1px solid var(--line);background:var(--white);border-radius:7px;padding:7px 11px;font-size:12.5px;font-weight:500;color:var(--mut)}
+.btn{background:var(--teal);color:#fff;border-radius:7px;padding:8px 14px;font-size:12.5px;font-weight:600}
+.btn:hover{background:var(--teal-dk)}
+.btn.ghost{background:var(--white);color:var(--ink);border:1px solid var(--line)}
+.btn.ghost:hover{background:var(--bg)}
+.btn.sm{padding:5px 10px;font-size:11.5px}
+.btn:disabled{opacity:.42;cursor:not-allowed}
+
+/* ---------- primitives ---------- */
+.card{background:var(--white);border:1px solid var(--line);border-radius:10px}
+.card h3{font-size:12.5px;font-weight:600;letter-spacing:.02em;padding:13px 16px;border-bottom:1px solid var(--line)}
+.card .bd{padding:16px}
+.grid{display:grid;gap:14px}
+.sect{font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);margin:22px 0 10px}
+.sect:first-child{margin-top:0}
+
+.stat{background:var(--white);border:1px solid var(--line);border-radius:10px;padding:13px 14px}
+.stat .k{font-size:11px;font-weight:500;color:var(--mut);display:flex;align-items:center;gap:5px}
+.stat .v{font-size:25px;font-weight:700;letter-spacing:-.03em;margin-top:5px}
+.stat .s{font-size:11px;color:var(--faint);margin-top:2px}
+.stat.warn{border-color:#F0DDBB;background:var(--amber-bg)} .stat.warn .v{color:var(--amber)}
+.stat.crit{border-color:#F3CFCC;background:var(--red-bg)} .stat.crit .v{color:var(--red)}
+.stat.good .v{color:var(--green)}
+
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;letter-spacing:.03em;
+  padding:3px 8px;border-radius:5px;white-space:nowrap;text-transform:uppercase}
+.pill::before{content:'';width:5px;height:5px;border-radius:99px;background:currentColor}
+.p-green{color:var(--green);background:var(--green-bg)}
+.p-amber{color:var(--amber);background:var(--amber-bg)}
+.p-orange{color:var(--orange);background:var(--orange-bg)}
+.p-red{color:var(--red);background:var(--red-bg)}
+.p-grey{color:var(--mut);background:#EEF1F0}
+.p-teal{color:var(--teal);background:var(--teal-lt)}
+
+table{width:100%;border-collapse:collapse}
+th{font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);
+  text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:11px 12px;border-bottom:1px solid #F1F3F3;font-size:13px;vertical-align:middle}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:#FAFBFB}
+td.r,th.r{text-align:right}
+.plate{font-weight:600;color:var(--teal);letter-spacing:.02em}
+.sub{font-size:11.5px;color:var(--faint)}
+
+.risk{display:flex;align-items:center;gap:7px}
+.risk .bar{width:52px;height:5px;border-radius:99px;background:#EDEFEF;overflow:hidden}
+.risk .bar i{display:block;height:100%;border-radius:99px}
+.risk b{font-size:11.5px;font-weight:600;width:20px}
+
+.money-hero{font-size:40px;font-weight:700;letter-spacing:-.035em;line-height:1.05}
+.kv{display:flex;justify-content:space-between;align-items:baseline;padding:9px 0;border-bottom:1px solid #F1F3F3;font-size:13px}
+.kv:last-child{border-bottom:0}
+.kv span{color:var(--mut)} .kv b{font-weight:600}
+.bar-track{height:6px;border-radius:99px;background:#EAEDEC;overflow:hidden;margin-top:8px}
+.bar-track i{display:block;height:100%;background:var(--teal);border-radius:99px}
+
+.alert{display:flex;gap:11px;padding:13px 15px;border-radius:9px;font-size:13px;align-items:flex-start}
+.alert.red{background:var(--red-bg);border:1px solid #F3CFCC;color:#7A1A15}
+.alert.amber{background:var(--amber-bg);border:1px solid #F0DDBB;color:#7A4A00}
+.alert b{display:block;margin-bottom:2px}
+
+.qr{width:150px;height:150px;border-radius:9px;border:1px solid var(--line);padding:8px;background:#fff}
+.copyrow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #F1F3F3;font-size:12.5px}
+.copyrow:last-child{border-bottom:0}
+.copyrow span{color:var(--mut)}
+.copyrow b{font-weight:600;display:flex;align-items:center;gap:7px}
+.copyrow button{font-size:10.5px;font-weight:600;color:var(--teal);background:var(--teal-lt);padding:2px 7px;border-radius:4px}
+
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin-bottom:16px;overflow-x:auto}
+.tabs button{padding:9px 13px;font-size:12.5px;font-weight:600;color:var(--mut);border-bottom:2px solid transparent;white-space:nowrap}
+.tabs button[aria-selected=true]{color:var(--teal);border-bottom-color:var(--teal)}
+
+.buckets{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.bucket{border:1px solid var(--line);background:var(--white);border-radius:10px;padding:13px 14px;text-align:left;border-left-width:3px}
+.bucket:hover{border-color:var(--faint)}
+.bucket[aria-pressed=true]{box-shadow:0 0 0 2px rgba(15,93,82,.18);border-color:var(--teal)}
+.bucket .k{font-size:11.5px;font-weight:600;color:var(--mut)}
+.bucket .v{font-size:23px;font-weight:700;letter-spacing:-.03em;margin-top:4px}
+.bucket .s{font-size:11.5px;color:var(--faint);margin-top:1px}
+.b-green{border-left-color:var(--green)} .b-green .v{color:var(--green)}
+.b-amber{border-left-color:#D99100} .b-amber .v{color:var(--amber)}
+.b-orange{border-left-color:var(--orange)} .b-orange .v{color:var(--orange)}
+.b-red{border-left-color:var(--red)} .b-red .v{color:var(--red)}
+
+.tl{position:relative;padding-left:19px}
+.tl::before{content:'';position:absolute;left:4px;top:5px;bottom:5px;width:1px;background:var(--line)}
+.tl .ev{position:relative;padding:0 0 13px}
+.tl .ev::before{content:'';position:absolute;left:-18px;top:5px;width:7px;height:7px;border-radius:99px;background:var(--teal);outline:2px solid #fff}
+.tl .ev.mut::before{background:var(--faint)}
+.tl .t{font-size:12.5px;font-weight:600}
+.tl .d{font-size:11.5px;color:var(--faint)}
+
+.docrow{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #F1F3F3}
+.docrow:last-child{border-bottom:0}
+.ico{width:34px;height:34px;border-radius:8px;background:var(--teal-lt);color:var(--teal);display:grid;place-items:center;flex:none}
+.ico svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8}
+.docrow .m{flex:1;min-width:0}
+.docrow .m b{font-size:13px;font-weight:600;display:block}
+
+.setrow{display:grid;grid-template-columns:1fr 150px;gap:14px;align-items:center;padding:13px 0;border-bottom:1px solid #F1F3F3}
+.setrow:last-child{border-bottom:0}
+.setrow b{font-size:13px;font-weight:600;display:block}
+.setrow .h{font-size:11.5px;color:var(--faint);margin-top:2px;max-width:62ch}
+.inp{width:100%;border:1px solid var(--line);border-radius:7px;padding:7px 10px;font:inherit;font-size:13px;
+  font-variant-numeric:tabular-nums;background:var(--white)}
+.inp:focus{outline:2px solid rgba(15,93,82,.25);border-color:var(--teal)}
+
+.note{font-size:11.5px;color:var(--faint);margin-top:10px;line-height:1.55}
+.screen{display:none} .screen.on{display:block}
+.phone-note{background:var(--teal-lt);border:1px solid #CDE2DE;color:var(--teal-dk);border-radius:9px;
+  padding:11px 14px;font-size:12.5px;margin-bottom:18px}
+@media(max-width:860px){.shell{grid-template-columns:1fr}.side{flex-direction:row;overflow-x:auto;padding:8px}
+ .side .grp,.side .who{display:none}.main{padding:16px}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><span class="mark">V</span><span>Vida Partners<small>Fleet Leasing Platform</small></span></div>
+  <div class="appsw" role="group" aria-label="Switch application">
+    <button id="sw-admin" aria-pressed="true" onclick="setApp('admin')">Admin Dashboard</button>
+    <button id="sw-portal" aria-pressed="false" onclick="setApp('portal')">Customer Portal</button>
+  </div>
+  <span class="badge-demo">Interactive preview · seed data</span>
+</header>
+
+<div class="shell">
+  <nav class="side" id="nav"></nav>
+  <main class="main" id="main">
+
+  <!-- ========================= ADMIN: FLEET OVERVIEW ========================= -->
+  <section class="screen on" id="s-overview" data-app="admin">
+    <div class="phead">
+      <div><h1>Fleet Overview</h1><p>All branches · Thursday, 20 August 2026</p></div>
+      <div class="filters">
+        <select class="sel"><option>All branches</option><option>Ubi</option><option>Tuas</option><option>Woodlands</option></select>
+        <button class="btn ghost">Export</button>
+      </div>
+    </div>
+
+    <div class="sect">Fleet</div>
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(158px,1fr))">
+      <div class="stat"><div class="k">Total vehicles</div><div class="v num">412</div><div class="s">across 3 branches</div></div>
+      <div class="stat good"><div class="k">Available</div><div class="v num">68</div><div class="s">ready to rent</div></div>
+      <div class="stat"><div class="k">Currently rented</div><div class="v num">311</div><div class="s">active agreements</div></div>
+      <div class="stat"><div class="k">Maintenance</div><div class="v num">19</div><div class="s">off the road</div></div>
+      <div class="stat"><div class="k">Returning soon</div><div class="v num">24</div><div class="s">within 14 days</div></div>
+      <div class="stat"><div class="k">Fleet utilisation</div><div class="v num">84.7%</div>
+        <div class="bar-track"><i style="width:84.7%"></i></div></div>
+    </div>
+
+    <div class="sect">Money</div>
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(190px,1fr))">
+      <div class="stat"><div class="k">Monthly revenue</div><div class="v num">S$1,284,400</div><div class="s">Aug 2026 to date</div></div>
+      <div class="stat warn"><div class="k">Outstanding receivables</div><div class="v num">S$98,640</div><div class="s">121 open invoices</div></div>
+      <div class="stat"><div class="k">Payments due today</div><div class="v num">37</div><div class="s">S$29,600</div></div>
+      <div class="stat crit"><div class="k">Overdue payments</div><div class="v num">23</div><div class="s">S$16,740 + interest</div></div>
+    </div>
+
+    <div class="sect">Compliance &amp; servicing</div>
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(158px,1fr))">
+      <div class="stat"><div class="k">Upcoming servicing</div><div class="v num">14</div><div class="s">next 30 days</div></div>
+      <div class="stat"><div class="k">Upcoming inspection</div><div class="v num">9</div><div class="s">next 30 days</div></div>
+      <div class="stat warn"><div class="k">Insurance expiring</div><div class="v num">6</div><div class="s">within 30 days</div></div>
+      <div class="stat warn"><div class="k">Road tax expiring</div><div class="v num">11</div><div class="s">within 30 days</div></div>
+      <div class="stat crit"><div class="k">COE expiring</div><div class="v num">4</div><div class="s">within 90 days</div></div>
+    </div>
+
+    <div class="sect">Needs attention</div>
+    <div class="card"><div class="bd" style="display:grid;gap:11px">
+      <div class="alert red"><div><b>3 payment submissions awaiting verification</b>
+        Oldest submitted 2 days ago by Marcus Tan (VP-INV-2026-004312, S$840.00).</div></div>
+      <div class="alert amber"><div><b>SLT6628E — COE expires in 61 days (11 Oct 2026)</b>
+        Second reminder in the 90/60/30/7 ladder fired this morning.</div></div>
+      <div class="alert amber"><div><b>SMY2210B — road tax expires in 2 days (22 Aug 2026)</b>
+        Final reminder sent. Vehicle is currently rented to Chua Kok Leong.</div></div>
+    </div></div>
+  </section>
+
+  <!-- ========================= ADMIN: COLLECTIONS ========================= -->
+  <section class="screen" id="s-collections" data-app="admin">
+    <div class="phead">
+      <div><h1>Collections</h1><p>Revenue protection · ageing, risk and chase actions</p></div>
+      <div class="filters">
+        <select class="sel"><option>All branches</option><option>Ubi</option><option>Tuas</option></select>
+        <button class="btn">Send batch reminders</button>
+      </div>
+    </div>
+
+    <div class="buckets">
+      <button class="bucket b-green" aria-pressed="false" onclick="filt('upcoming',this)">
+        <div class="k">Due next 7 days</div><div class="v num">S$52,300</div><div class="s num">61 invoices</div></button>
+      <button class="bucket b-amber" aria-pressed="false" onclick="filt('today',this)">
+        <div class="k">Due today</div><div class="v num">S$29,600</div><div class="s num">37 invoices</div></button>
+      <button class="bucket b-orange" aria-pressed="false" onclick="filt('o17',this)">
+        <div class="k">1–7 days overdue</div><div class="v num">S$12,840</div><div class="s num">15 invoices</div></button>
+      <button class="bucket b-red" aria-pressed="false" onclick="filt('o8',this)">
+        <div class="k">8+ days overdue</div><div class="v num">S$3,900</div><div class="s num">8 invoices</div></button>
+    </div>
+
+    <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:12px">
+      <div class="stat"><div class="k">Total outstanding receivables</div><div class="v num">S$98,640</div>
+        <div class="s">121 open invoices across 3 branches</div></div>
+      <div class="stat warn"><div class="k">Late interest accrued</div><div class="v num">S$4,182</div>
+        <div class="s">simple daily @ 1.00% after 3-day grace</div></div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h3>Ageing detail <span class="sub" id="filtnote">— showing all 6 of 121</span></h3>
+      <div style="overflow-x:auto"><table>
+        <thead><tr>
+          <th>Customer</th><th>Vehicle</th><th>Invoice</th><th>Due</th><th class="r">Days</th>
+          <th class="r">Principal</th><th class="r">Interest</th><th class="r">Total due</th>
+          <th>Risk</th><th class="r">Sent</th><th>Chase</th><th></th>
+        </tr></thead>
+        <tbody id="crows"></tbody>
+      </table></div>
+      <div class="bd" style="border-top:1px solid var(--line)">
+        <p class="note" style="margin:0">WhatsApp and SMS buttons are intentionally disabled. The notification layer is
+        channel-abstracted and both adapters exist as classes — they need a BSP account and template approval before
+        they can send. Email is live via Resend.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= ADMIN: VEHICLES ========================= -->
+  <section class="screen" id="s-vehicles" data-app="admin">
+    <div class="phead">
+      <div><h1>Vehicles</h1><p>412 vehicles · click a plate to open its dashboard</p></div>
+      <div class="filters">
+        <select class="sel"><option>All statuses</option><option>Available</option><option>Rented out</option></select>
+        <select class="sel"><option>All branches</option></select>
+        <button class="btn">Add vehicle</button>
+      </div>
+    </div>
+    <div class="card"><div style="overflow-x:auto"><table>
+      <thead><tr><th>Plate</th><th>Make / model</th><th class="r">Year</th><th>Status</th><th>Branch</th>
+        <th>Road tax</th><th>Insurance</th><th class="r">Mileage</th></tr></thead>
+      <tbody id="vrows"></tbody>
+    </table></div></div>
+  </section>
+
+  <!-- ========================= ADMIN: VEHICLE DASHBOARD ========================= -->
+  <section class="screen" id="s-vehicle" data-app="admin">
+    <div class="phead">
+      <div>
+        <h1 style="display:flex;align-items:center;gap:11px">SMR1337G <span class="pill p-teal">Rented out</span></h1>
+        <p>Toyota Corolla Altis 1.6 · 2023 · Ubi branch</p>
+      </div>
+      <div class="filters"><button class="btn ghost">Change status</button><button class="btn">Edit</button></div>
+    </div>
+    <div class="tabs">
+      <button aria-selected="true">Overview</button><button aria-selected="false">Service history</button>
+      <button aria-selected="false">Accidents</button><button aria-selected="false">Documents</button>
+      <button aria-selected="false">Payments</button><button aria-selected="false">Notes</button>
+    </div>
+    <div class="grid" style="grid-template-columns:1.35fr 1fr">
+      <div class="grid" style="gap:14px">
+        <div class="card"><h3>Registration &amp; compliance</h3><div class="bd">
+          <div class="kv"><span>Registration number</span><b class="num">SMR1337G</b></div>
+          <div class="kv"><span>Make / model / year</span><b>Toyota Corolla Altis 1.6 · 2023</b></div>
+          <div class="kv"><span>Chassis</span><b class="num">MR053BEA40X119284</b></div>
+          <div class="kv"><span>COE expiry</span><b class="num">14 Mar 2033 <span class="pill p-green">2,397 d</span></b></div>
+          <div class="kv"><span>Road tax expiry</span><b class="num">31 Dec 2026 <span class="pill p-green">133 d</span></b></div>
+          <div class="kv"><span>Insurance expiry</span><b class="num">11 Jan 2027 <span class="pill p-green">144 d</span></b></div>
+          <div class="kv"><span>Next inspection</span><b class="num">14 Nov 2026 <span class="pill p-amber">86 d</span></b></div>
+          <div class="kv"><span>Current mileage</span><b class="num">84,210 km</b></div>
+          <div class="kv"><span>Next service</span><b class="num">22 Sep 2026 · 90,000 km</b></div>
+        </div></div>
+        <div class="card"><h3>Service history</h3><div style="overflow-x:auto"><table>
+          <thead><tr><th>Date</th><th>Type</th><th>Workshop</th><th class="r">Mileage</th><th class="r">Cost</th></tr></thead>
+          <tbody>
+            <tr><td class="num">22 Jun 2026</td><td>Scheduled service</td><td>Ubi Auto Werkz</td><td class="r num">80,000</td><td class="r num">S$284.00</td></tr>
+            <tr><td class="num">03 Mar 2026</td><td>Tyre replacement</td><td>Stamford Tyres</td><td class="r num">74,120</td><td class="r num">S$620.00</td></tr>
+            <tr><td class="num">18 Dec 2025</td><td>Scheduled service</td><td>Ubi Auto Werkz</td><td class="r num">70,000</td><td class="r num">S$268.00</td></tr>
+          </tbody></table></div></div>
+      </div>
+      <div class="grid" style="gap:14px;align-content:start">
+        <div class="card"><h3>Current rental</h3><div class="bd">
+          <div class="kv"><span>Customer</span><b>Marcus Tan Wei Ming</b></div>
+          <div class="kv"><span>Agreement</span><b class="num">VP-R-2026-00187</b></div>
+          <div class="kv"><span>Period</span><b class="num">12 Jan 26 – 11 Jan 27</b></div>
+          <div class="kv"><span>Billing</span><b>Weekly · S$800.00</b></div>
+          <div class="kv"><span>Deposit held</span><b class="num">S$2,400.00</b></div>
+          <div class="kv"><span>Payment status</span><b><span class="pill p-red">Overdue 5 d</span></b></div>
+          <div class="kv"><span>Current amount due</span><b class="num" style="color:var(--red)">S$840.00</b></div>
+        </div></div>
+        <div class="card"><h3>Accident history</h3><div class="bd">
+          <div class="alert amber" style="margin-bottom:10px"><div><b>04 Apr 2026 · not at fault</b>
+            Rear-ended along PIE. Claim INS-2026-3391 settled. Excess not charged.</div></div>
+          <p class="note" style="margin:0">Excess of S$2,000.00 applies to at-fault claims under this agreement.</p>
+        </div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= ADMIN: PAYMENT VERIFICATION ========================= -->
+  <section class="screen" id="s-queue" data-app="admin">
+    <div class="phead">
+      <div><h1>Payment verification</h1><p>3 submissions pending · oldest 2 days ago</p></div>
+      <div class="filters"><select class="sel"><option>Pending verification</option><option>Approved</option><option>Rejected</option></select></div>
+    </div>
+    <div class="alert amber" style="margin-bottom:16px"><div><b>Separation of duty is enforced here</b>
+      Only ACCOUNTS, BRANCH_MANAGER and SUPER_ADMIN see the approve and reject controls. An OPERATIONS user
+      viewing this screen sees the queue read-only — the API rejects the call too, not just the UI.</div></div>
+    <div class="grid" id="qrows" style="gap:14px"></div>
+  </section>
+
+  <!-- ========================= ADMIN: SETTINGS ========================= -->
+  <section class="screen" id="s-settings" data-app="admin">
+    <div class="phead">
+      <div><h1>Policy settings</h1><p>Business rules the team changes without a developer</p></div>
+      <div class="filters"><select class="sel"><option>Global default</option><option>Ubi branch</option></select>
+        <button class="btn">Save changes</button></div>
+    </div>
+    <div class="grid" style="grid-template-columns:1fr 1fr">
+      <div class="grid" style="gap:14px;align-content:start">
+        <div class="card"><h3>Late payment</h3><div class="bd">
+          <div class="setrow"><div><b>Daily interest rate</b><div class="h">Simple daily interest on outstanding
+            principal. Never compounds — accrued interest is not itself charged interest.</div></div>
+            <input class="inp" value="1.00 %"></div>
+          <div class="setrow"><div><b>Grace period</b><div class="h">Days after the due date before interest starts.
+            With a 10 Aug due date and 3 days grace, the first charge is dated 14 Aug.</div></div>
+            <input class="inp" value="3 days"></div>
+          <div class="setrow"><div><b>Interest cap</b><div class="h">Ceiling on total interest as a share of principal.
+            0 % means uncapped.</div></div><input class="inp" value="0 %"></div>
+          <div class="setrow"><div><b>Flat late fee</b><div class="h">One-off administrative charge applied when an
+            invoice first goes overdue.</div></div><input class="inp" value="S$0.00"></div>
+        </div></div>
+        <div class="card"><h3>Reminder schedule</h3><div class="bd">
+          <div class="setrow"><div><b>Before due date</b><div class="h">Comma-separated days.</div></div>
+            <input class="inp" value="3, 1"></div>
+          <div class="setrow"><div><b>On due date</b><div class="h">Send a reminder on the day itself.</div></div>
+            <input class="inp" value="Enabled"></div>
+          <div class="setrow"><div><b>Overdue repeat</b><div class="h">Chase every N days until paid.</div></div>
+            <input class="inp" value="3 days"></div>
+          <div class="setrow"><div><b>Stop chasing after</b><div class="h">Escalate to a human past this point.</div></div>
+            <input class="inp" value="90 days"></div>
+        </div></div>
+      </div>
+      <div class="grid" style="gap:14px;align-content:start">
+        <div class="card"><h3>Vehicle expiry ladders</h3><div class="bd">
+          <div class="setrow"><div><b>COE</b><div class="h">Days before expiry to alert.</div></div><input class="inp" value="90, 60, 30, 7"></div>
+          <div class="setrow"><div><b>Road tax</b><div class="h"></div></div><input class="inp" value="30, 14, 7"></div>
+          <div class="setrow"><div><b>Insurance</b><div class="h"></div></div><input class="inp" value="30, 14, 7"></div>
+          <div class="setrow"><div><b>Inspection</b><div class="h"></div></div><input class="inp" value="30, 14, 7"></div>
+        </div></div>
+        <div class="card"><h3>Payment rails</h3><div class="bd">
+          <div class="setrow"><div><b>PayNow UEN</b><div class="h">Used to generate every invoice QR.</div></div>
+            <input class="inp" value="202512345K"></div>
+          <div class="setrow"><div><b>Merchant name</b><div class="h">What the payer sees in their banking app.</div></div>
+            <input class="inp" value="VIDA PARTNERS"></div>
+          <div class="setrow"><div><b>Bank account</b><div class="h">Shown as the transfer fallback.</div></div>
+            <input class="inp" value="003-901234-5"></div>
+          <div class="setrow"><div><b>GST registered</b><div class="h">Vida Partners is not GST-registered. Invoices
+            carry no tax line. Flipping this later is a settings change, not a migration.</div></div>
+            <input class="inp" value="No"></div>
+        </div></div>
+      </div>
+    </div>
+  </section>
+  <!-- ========================= PORTAL: DASHBOARD ========================= -->
+  <section class="screen" id="s-cdash" data-app="portal">
+    <div class="phead">
+      <div><h1>Welcome back, Marcus</h1><p>Customer VP-C-00042 · Ubi branch</p></div>
+    </div>
+    <div class="phone-note">Most renters open this on a phone at a carpark. Every portal screen is built
+      mobile-first — resize the window to see the layout collapse.</div>
+
+    <div class="alert red" style="margin-bottom:16px"><div><b>Payment overdue by 5 days</b>
+      S$800.00 was due on 10 Aug 2026. Late interest of S$40.00 has been added and continues to accrue at
+      1% of the outstanding amount each day.</div></div>
+
+    <div class="grid" style="grid-template-columns:1.3fr 1fr">
+      <div class="card"><h3>Your rental</h3><div class="bd">
+        <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start">
+          <div style="flex:1;min-width:220px">
+            <div style="font-size:26px;font-weight:700;letter-spacing:-.03em" class="num">SMR1337G</div>
+            <div style="color:var(--mut);margin-top:2px">Toyota Corolla Altis 1.6 · 2023</div>
+            <div class="kv" style="margin-top:14px"><span>Rental start</span><b class="num">12 Jan 2026</b></div>
+            <div class="kv"><span>Rental end</span><b class="num">11 Jan 2027</b></div>
+            <div class="kv"><span>Duration</span><b class="num">365 days</b></div>
+            <div class="kv"><span>Remaining</span><b class="num">158 days</b></div>
+            <div style="margin-top:12px">
+              <div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--faint)">
+                <span>207 days elapsed</span><span>57%</span></div>
+              <div class="bar-track"><i style="width:57%"></i></div>
+            </div>
+          </div>
+          <div style="width:190px;flex:none">
+            <div style="height:118px;border-radius:9px;background:linear-gradient(160deg,#DDE5E3,#C3D2CE);
+              display:grid;place-items:center;color:var(--teal-dk);font-size:11.5px;font-weight:600">Vehicle photo 1 / 4</div>
+            <div style="display:flex;gap:6px;margin-top:6px">
+              <div style="flex:1;height:34px;border-radius:6px;background:#E6ECEA"></div>
+              <div style="flex:1;height:34px;border-radius:6px;background:#E6ECEA"></div>
+              <div style="flex:1;height:34px;border-radius:6px;background:#E6ECEA"></div>
+            </div>
+          </div>
+        </div>
+      </div></div>
+
+      <div class="card" style="border-color:#F3CFCC"><h3>Amount due now</h3><div class="bd">
+        <div class="money-hero num" style="color:var(--red)">S$840.00</div>
+        <div style="color:var(--mut);font-size:12.5px;margin-top:5px">Due 10 Aug 2026 · <span class="pill p-red">Overdue</span></div>
+        <button class="btn" style="width:100%;margin-top:14px;padding:11px" onclick="go('s-pay')">Go to payment centre</button>
+        <div style="margin-top:14px">
+          <div class="kv"><span>Weekly rental</span><b class="num">S$800.00</b></div>
+          <div class="kv"><span>Late payment interest</span><b class="num" style="color:var(--red)">S$40.00</b></div>
+          <div class="kv"><span>Deposit paid</span><b class="num">S$2,400.00</b></div>
+          <div class="kv"><span>Remaining deposit balance</span><b class="num">S$2,400.00</b></div>
+          <div class="kv"><span>Accident excess</span><b class="num">S$2,000.00</b></div>
+          <div class="kv"><span>Outstanding balance</span><b class="num">S$840.00</b></div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(230px,1fr));margin-top:14px">
+      <div class="card"><h3>Vehicle information</h3><div class="bd">
+        <div class="kv"><span>Next servicing</span><b class="num">22 Sep 2026</b></div>
+        <div class="kv"><span>Inspection due</span><b class="num">14 Nov 2026</b></div>
+        <div class="kv"><span>Road tax expiry</span><b class="num">31 Dec 2026</b></div>
+        <div class="kv"><span>Insurance expiry</span><b class="num">11 Jan 2027</b></div>
+      </div></div>
+      <div class="card"><h3>Emergency contacts</h3><div class="bd">
+        <div class="kv"><span>Roadside assistance</span><b class="num">+65 6100 2424</b></div>
+        <div class="kv"><span>Vida support</span><b class="num">+65 6100 8888</b></div>
+        <div class="kv"><span>Email</span><b>support@vidapartners.com.sg</b></div>
+        <p class="note">Numbers are tap-to-call on mobile.</p>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- ========================= PORTAL: PAYMENT CENTRE ========================= -->
+  <section class="screen" id="s-pay" data-app="portal">
+    <div class="phead"><div><h1>Payment centre</h1><p>Invoice VP-INV-2026-004312 · period 10–16 Aug 2026</p></div></div>
+
+    <div class="grid" style="grid-template-columns:1fr 1.15fr">
+      <div class="card" style="border-color:#F3CFCC"><div class="bd">
+        <div style="font-size:11.5px;font-weight:600;color:var(--mut);letter-spacing:.03em;text-transform:uppercase">Current amount due</div>
+        <div class="money-hero num" style="color:var(--red);margin-top:6px">S$840.00</div>
+        <div style="display:flex;gap:8px;margin-top:9px;flex-wrap:wrap">
+          <span class="pill p-red">Overdue 5 days</span><span class="pill p-grey">Due 10 Aug 2026</span></div>
+        <div style="margin-top:16px">
+          <div class="kv"><span>Weekly rental</span><b class="num">S$800.00</b></div>
+          <div class="kv"><span>Late payment interest</span><b class="num">S$40.00</b></div>
+          <div class="kv"><span>Total payable</span><b class="num" style="font-size:15px">S$840.00</b></div>
+        </div>
+        <button class="btn" style="width:100%;margin-top:16px;padding:12px;font-size:14px" onclick="claim()">I've made payment</button>
+        <p class="note">You'll be asked for your transaction reference. A screenshot is optional but speeds up
+          verification. Our team reviews submissions on the same working day.</p>
+      </div></div>
+
+      <div class="card"><h3>Pay by PayNow</h3><div class="bd">
+        <div style="display:flex;gap:18px;flex-wrap:wrap">
+          <div>
+            <div class="qr" id="qrbox"></div>
+            <div style="text-align:center;font-size:11px;color:var(--faint);margin-top:7px">Scan with any SG banking app</div>
+          </div>
+          <div style="flex:1;min-width:210px">
+            <p style="font-size:12.5px;color:var(--mut);margin-bottom:10px">The amount and reference are built into
+              this QR, so your banking app fills both in automatically.</p>
+            <div class="copyrow"><span>Amount</span><b class="num">S$840.00 <button>Copy</button></b></div>
+            <div class="copyrow"><span>Reference</span><b class="num">VPINV2026004312 <button>Copy</button></b></div>
+            <div class="copyrow"><span>UEN</span><b class="num">202512345K <button>Copy</button></b></div>
+            <div style="border-top:1px solid var(--line);margin-top:11px;padding-top:11px">
+              <div style="font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);margin-bottom:6px">Or bank transfer</div>
+              <div class="copyrow"><span>Bank</span><b>DBS Bank Ltd</b></div>
+              <div class="copyrow"><span>Account name</span><b>Vida Partners Pte Ltd</b></div>
+              <div class="copyrow"><span>Account</span><b class="num">003-901234-5 <button>Copy</button></b></div>
+            </div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:14px">
+      <div class="card"><h3>How your late interest was calculated</h3><div style="overflow-x:auto"><table>
+        <thead><tr><th>Date</th><th class="r">Outstanding</th><th class="r">Rate</th><th class="r">Charge</th><th class="r">Running total</th></tr></thead>
+        <tbody id="irows"></tbody></table></div>
+        <div class="bd" style="border-top:1px solid var(--line)"><p class="note" style="margin:0">
+          Simple daily interest on the outstanding amount, starting after a 3-day grace period. Interest is never
+          charged on interest. Paying part of the balance reduces every future day's charge.</p></div>
+      </div>
+      <div class="card"><h3>Payment history</h3><div style="overflow-x:auto"><table>
+        <thead><tr><th>Receipt</th><th>Date</th><th class="r">Amount</th><th>Method</th><th>Status</th><th></th></tr></thead>
+        <tbody id="phrows"></tbody></table></div></div>
+    </div>
+  </section>
+
+  <!-- ========================= PORTAL: DOCUMENTS ========================= -->
+  <section class="screen" id="s-docs" data-app="portal">
+    <div class="phead"><div><h1>Documents</h1><p>Everything tied to your agreement, downloadable any time</p></div></div>
+    <div class="grid" style="grid-template-columns:1fr 1fr">
+      <div class="card"><h3>Agreement &amp; vehicle</h3><div class="bd" id="docs1"></div></div>
+      <div class="card"><h3>Invoices &amp; receipts</h3><div class="bd" id="docs2"></div></div>
+    </div>
+    <p class="note">Downloads are served as short-lived signed links. Nothing in the document store is publicly
+      readable, and a customer can only ever see files attached to their own agreement.</p>
+  </section>
+  </main>
+</div>
+
+<script>
+/* Seed data mirroring apps/api/prisma/seed.ts so the preview shows the same
+   numbers a reviewer will see after `pnpm db:seed`. */
+const VIDA = {
+  customer: {
+    name: 'Marcus Tan Wei Ming',
+    ref: 'VP-C-00042',
+    plate: 'SMR1337G',
+    model: 'Toyota Corolla Altis 1.6',
+    year: 2023,
+    start: '12 Jan 2026',
+    end: '11 Jan 2027',
+    durationDays: 365,
+    remainingDays: 158,
+    freq: 'Weekly',
+    rent: 'S$800.00',
+    depositPaid: 'S$2,400.00',
+    depositBalance: 'S$2,400.00',
+    excess: 'S$2,000.00',
+    outstanding: 'S$840.00',
+    interest: 'S$40.00',
+    due: 'S$840.00',
+    dueDate: '10 Aug 2026',
+    status: 'OVERDUE',
+    daysOverdue: 5,
+    nextService: '22 Sep 2026',
+    inspection: '14 Nov 2026',
+    roadTax: '31 Dec 2026',
+    insurance: '11 Jan 2027',
+  },
+  interestRows: [
+    ['14 Aug 2026', 'S$800.00', '1.00%', 'S$8.00', 'S$8.00'],
+    ['15 Aug 2026', 'S$800.00', '1.00%', 'S$8.00', 'S$16.00'],
+    ['16 Aug 2026', 'S$800.00', '1.00%', 'S$8.00', 'S$24.00'],
+    ['17 Aug 2026', 'S$800.00', '1.00%', 'S$8.00', 'S$32.00'],
+    ['18 Aug 2026', 'S$800.00', '1.00%', 'S$8.00', 'S$40.00'],
+  ],
+  payHistory: [
+    ['VP-RCP-2026-002145', '03 Aug 2026', 'S$800.00', 'PayNow', 'PAID'],
+    ['VP-RCP-2026-002098', '27 Jul 2026', 'S$800.00', 'PayNow', 'PAID'],
+    ['VP-RCP-2026-002051', '20 Jul 2026', 'S$800.00', 'PayNow', 'PAID'],
+    ['VP-RCP-2026-002004', '13 Jul 2026', 'S$800.00', 'Bank Transfer', 'PAID'],
+  ],
+  fleet: {
+    total: 412, available: 68, rented: 311, maintenance: 19, returning: 24,
+    dueToday: 37, overdue: 23, servicing: 14, inspection: 9,
+    insurance: 6, roadtax: 11, coe: 4,
+    revenue: 'S$1,284,400', receivables: 'S$98,640', utilisation: 84.7,
+  },
+  collections: {
+    upcoming: { n: 61, v: 'S$52,300' },
+    today: { n: 37, v: 'S$29,600' },
+    o17: { n: 15, v: 'S$12,840' },
+    o8: { n: 8, v: 'S$3,900' },
+    total: 'S$98,640', interest: 'S$4,182',
+  },
+  collectionRows: [
+    ['Marcus Tan Wei Ming', 'SMR1337G', 'VP-INV-2026-004312', '10 Aug', 5, 'S$800.00', 'S$40.00', 'S$840.00', 62, 3, 'o17'],
+    ['Priya Nair', 'SLX8842J', 'VP-INV-2026-004287', '08 Aug', 7, 'S$1,050.00', 'S$73.50', 'S$1,123.50', 74, 4, 'o17'],
+    ['Chua Kok Leong', 'SMY2210B', 'VP-INV-2026-004199', '28 Jul', 18, 'S$800.00', 'S$120.00', 'S$920.00', 91, 7, 'o8'],
+    ['Nurul Aisyah Binte Rahman', 'SNP4471K', 'VP-INV-2026-004401', '15 Aug', 0, 'S$920.00', 'S$0.00', 'S$920.00', 12, 1, 'today'],
+    ['Daniel Lim Jun Hao', 'SMV9903C', 'VP-INV-2026-004410', '19 Aug', -4, 'S$800.00', 'S$0.00', 'S$800.00', 8, 0, 'upcoming'],
+    ['Ravi Kumar s/o Suresh', 'SLT6628E', 'VP-INV-2026-004203', '26 Jul', 20, 'S$1,200.00', 'S$240.00', 'S$1,440.00', 96, 8, 'o8'],
+  ],
+  queue: [
+    ['Marcus Tan Wei Ming', 'VP-INV-2026-004312', 'S$840.00', 'S$840.00', 'DBS-88213904', '15 Aug 2026', true],
+    ['Priya Nair', 'VP-INV-2026-004287', 'S$1,123.50', 'S$1,000.00', 'PN-4471QX', '15 Aug 2026', true],
+    ['Siti Zubaidah', 'VP-INV-2026-004355', 'S$920.00', 'S$920.00', 'OCBC-2201', '14 Aug 2026', false],
+  ],
+  vehicles: [
+    ['SMR1337G', 'Toyota', 'Corolla Altis', 2023, 'RENTED_OUT', 'Ubi', '31 Dec 2026', '11 Jan 2027', 84210],
+    ['SLX8842J', 'Honda', 'Vezel', 2022, 'RENTED_OUT', 'Ubi', '18 Sep 2026', '02 Oct 2026', 112400],
+    ['SMY2210B', 'Hyundai', 'Avante', 2024, 'RENTED_OUT', 'Tuas', '22 Aug 2026', '30 Nov 2026', 41300],
+    ['SNP4471K', 'Toyota', 'Sienta', 2023, 'AVAILABLE', 'Woodlands', '14 Mar 2027', '14 Mar 2027', 67800],
+    ['SMV9903C', 'Nissan', 'NV200', 2021, 'MAINTENANCE', 'Tuas', '05 Sep 2026', '19 Jan 2027', 158900],
+    ['SLT6628E', 'Toyota', 'Corolla Altis', 2022, 'ACCIDENT_REPAIR', 'Ubi', '11 Oct 2026', '11 Oct 2026', 98750],
+  ],
+};
+
+</script>
+<script>
+/* ---------------- navigation ---------------- */
+const NAV = {
+  admin: [
+    ['Operations', [['s-overview','Fleet overview','M3 12h18M3 6h18M3 18h18'],
+      ['s-vehicles','Vehicles','M5 17h14M6 17l-1-5 2-5h10l2 5-1 5M7 12h10'],
+      ['s-vehicle','Vehicle dashboard','M4 4h16v16H4zM4 10h16']]],
+    ['Revenue', [['s-collections','Collections','M12 3v18M8 7h8M8 17h8'],
+      ['s-queue','Payment verification','M4 6h16v12H4zM8 12l3 3 5-5']]],
+    ['Configuration', [['s-settings','Policy settings','M12 8a4 4 0 100 8 4 4 0 000-8zM4 12h2M18 12h2M12 4v2M12 18v2']]],
+  ],
+  portal: [
+    ['My rental', [['s-cdash','Dashboard','M4 10l8-6 8 6v10H4z'],
+      ['s-pay','Payment centre','M3 8h18v10H3zM3 12h18'],
+      ['s-docs','Documents','M7 3h7l4 4v14H7zM14 3v5h5']]],
+  ],
+};
+const WHO = { admin: ['Rachel Ong','Accounts · All branches'], portal: ['Marcus Tan Wei Ming','VP-C-00042 · Ubi'] };
+let app = 'admin';
+
+function setApp(a){
+  app = a;
+  document.getElementById('sw-admin').setAttribute('aria-pressed', a==='admin');
+  document.getElementById('sw-portal').setAttribute('aria-pressed', a==='portal');
+  renderNav();
+  go(a==='admin' ? 's-overview' : 's-cdash');
+}
+function renderNav(){
+  const n = document.getElementById('nav');
+  n.innerHTML = NAV[app].map(([grp, items]) =>
+    `<div class="grp">${grp}</div>` + items.map(([id,label,d]) =>
+      `<button data-id="${id}" onclick="go('${id}')">
+         <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg>${label}</button>`
+    ).join('')).join('')
+    + `<div class="who"><b>${WHO[app][0]}</b>${WHO[app][1]}</div>`;
+}
+function go(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === id));
+  document.querySelectorAll('#nav button').forEach(b =>
+    b.dataset.id === id ? b.setAttribute('aria-current','page') : b.removeAttribute('aria-current'));
+  window.scrollTo({top:0});
+}
+
+/* ---------------- renderers ---------------- */
+const riskColour = r => r >= 80 ? 'var(--red)' : r >= 55 ? 'var(--orange)' : r >= 30 ? 'var(--amber)' : 'var(--green)';
+const bucketPill = d => d > 7 ? '<span class="pill p-red">'+d+' d</span>'
+  : d > 0 ? '<span class="pill p-orange">'+d+' d</span>'
+  : d === 0 ? '<span class="pill p-amber">Today</span>'
+  : '<span class="pill p-green">in '+(-d)+' d</span>';
+
+let activeFilter = null;
+function filt(key, el){
+  activeFilter = activeFilter === key ? null : key;
+  document.querySelectorAll('.bucket').forEach(b => b.setAttribute('aria-pressed', b === el && activeFilter));
+  renderCollections();
+}
+function renderCollections(){
+  const rows = VIDA.collectionRows.filter(r => !activeFilter || r[10] === activeFilter);
+  document.getElementById('filtnote').textContent =
+    activeFilter ? `— filtered to ${rows.length}` : `— showing all ${VIDA.collectionRows.length} of 121`;
+  document.getElementById('crows').innerHTML = rows.map((r,i) => `
+    <tr>
+      <td><b>${r[0]}</b><div class="sub">Risk reviewed nightly</div></td>
+      <td class="plate num">${r[1]}</td><td class="num sub">${r[2]}</td><td class="num">${r[3]}</td>
+      <td class="r">${bucketPill(r[4])}</td>
+      <td class="r num">${r[5]}</td>
+      <td class="r num" style="color:${r[6]==='S$0.00'?'var(--faint)':'var(--red)'}">${r[6]}</td>
+      <td class="r num"><b>${r[7]}</b></td>
+      <td><div class="risk"><div class="bar"><i style="width:${r[8]}%;background:${riskColour(r[8])}"></i></div><b>${r[8]}</b></div></td>
+      <td class="r num">${r[9]}</td>
+      <td><div style="display:flex;gap:4px">
+        <button class="btn sm" onclick="remind('${r[0]}')">Email</button>
+        <button class="btn ghost sm" disabled title="Adapter present, transport not wired">WhatsApp</button>
+        <button class="btn ghost sm" disabled title="Adapter present, transport not wired">SMS</button>
+      </div></td>
+      <td><button class="btn ghost sm" onclick="trail(${i})">Trail</button></td>
+    </tr>
+    <tr id="tr-${i}" style="display:none"><td colspan="12" style="background:#FAFBFB">
+      <div style="padding:6px 2px 2px"><div class="sect" style="margin:0 0 10px">Payment audit trail — ${r[0]}</div>
+      <div class="tl">
+        <div class="ev"><div class="t">Reminder sent · email</div><div class="d">18 Aug 2026, 09:00 — third chaser, quoted ${r[7]}</div></div>
+        <div class="ev"><div class="t">Late interest accrued</div><div class="d">14–18 Aug 2026 — 5 daily entries, ${r[6]} total, 1.00%/day on ${r[5]}</div></div>
+        <div class="ev mut"><div class="t">Invoice became overdue</div><div class="d">14 Aug 2026 — 3-day grace expired</div></div>
+        <div class="ev mut"><div class="t">Reminder sent · email</div><div class="d">${r[3]} 2026, 09:00 — due-date notice</div></div>
+        <div class="ev mut"><div class="t">Invoice issued</div><div class="d">${r[2]} — ${r[5]} for the weekly period</div></div>
+      </div></div></td></tr>`).join('');
+}
+function trail(i){ const el = document.getElementById('tr-'+i); el.style.display = el.style.display === 'none' ? '' : 'none'; }
+function remind(name){ alert('Reminder queued for ' + name + '.\n\nIn the real system this enqueues a BullMQ job, sends via Resend, writes a ReminderLog row (unique per invoice + reminder code, so it can never double-send) and appends to the audit trail.'); }
+function claim(){ alert("I've Made Payment\n\nThe real modal asks for:\n  • Transaction reference (required)\n  • Payment screenshot (optional, uploaded straight to S3 via a presigned URL)\n  • Date paid\n\nOn submit the invoice moves to PENDING VERIFICATION, admins get an email plus a dashboard notification, and you receive a confirmation once Accounts approves it."); }
+
+const STATUS_PILL = { RENTED_OUT:'p-teal', AVAILABLE:'p-green', MAINTENANCE:'p-amber', ACCIDENT_REPAIR:'p-red' };
+function renderVehicles(){
+  document.getElementById('vrows').innerHTML = VIDA.vehicles.map(v => `
+    <tr><td><button class="plate num" onclick="go('s-vehicle')">${v[0]}</button></td>
+      <td>${v[1]} ${v[2]}</td><td class="r num">${v[3]}</td>
+      <td><span class="pill ${STATUS_PILL[v[4]]||'p-grey'}">${v[4].replace('_',' ')}</span></td>
+      <td>${v[5]}</td><td class="num">${v[6]}</td><td class="num">${v[7]}</td>
+      <td class="r num">${v[8].toLocaleString()} km</td></tr>`).join('');
+}
+function renderQueue(){
+  document.getElementById('qrows').innerHTML = VIDA.queue.map(q => `
+    <div class="card"><div class="bd" style="display:grid;grid-template-columns:118px 1fr auto;gap:18px;align-items:center">
+      <div style="height:96px;border-radius:8px;background:#EDF1F0;display:grid;place-items:center;
+        color:var(--faint);font-size:11px;text-align:center;padding:6px">${q[6]?'Payment<br>screenshot':'No screenshot<br>provided'}</div>
+      <div>
+        <div style="font-size:15px;font-weight:600">${q[0]}</div>
+        <div class="sub num" style="margin-bottom:8px">${q[1]} · submitted ${q[5]}</div>
+        <div style="display:flex;gap:26px;flex-wrap:wrap">
+          <div><div class="sub">Invoice amount</div><div class="num" style="font-weight:600">${q[2]}</div></div>
+          <div><div class="sub">Declared paid</div><div class="num" style="font-weight:600;color:${q[2]!==q[3]?'var(--orange)':'inherit'}">${q[3]}</div></div>
+          <div><div class="sub">Reference</div><div class="num" style="font-weight:600">${q[4]}</div></div>
+        </div>
+        ${q[2]!==q[3] ? '<div class="alert amber" style="margin-top:10px;padding:8px 11px"><div>Short payment — approving records a partial payment. The invoice stays PARTIALLY PAID and interest keeps accruing on the remaining principal only.</div></div>' : ''}
+      </div>
+      <div style="display:grid;gap:7px">
+        <button class="btn" onclick="alert('Approved.\\n\\nCreates a Payment row, writes a PAYMENT_RECEIVED ledger entry, generates receipt ${'VP-RCP-2026-002146'}, emails the customer, and records who approved it in the audit log.')">Approve</button>
+        <button class="btn ghost" onclick="alert('Reject requires a reason.\\n\\nThe invoice returns to its previous state, the customer is emailed the reason, and the rejection is written to the audit trail.')">Reject</button>
+      </div>
+    </div></div>`).join('');
+}
+function renderPortal(){
+  document.getElementById('irows').innerHTML = VIDA.interestRows.map(r =>
+    `<tr><td class="num">${r[0]}</td><td class="r num">${r[1]}</td><td class="r num">${r[2]}</td>
+     <td class="r num">${r[3]}</td><td class="r num"><b>${r[4]}</b></td></tr>`).join('');
+  document.getElementById('phrows').innerHTML = VIDA.payHistory.map(p =>
+    `<tr><td class="num sub">${p[0]}</td><td class="num">${p[1]}</td><td class="r num">${p[2]}</td>
+     <td>${p[3]}</td><td><span class="pill p-green">${p[4]}</span></td>
+     <td class="r"><button class="btn ghost sm">Receipt</button></td></tr>`).join('');
+  const doc = (t,s) => `<div class="docrow"><div class="ico">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l4 4v14H7zM14 3v5h5"/></svg></div>
+      <div class="m"><b>${t}</b><div class="sub">${s}</div></div>
+      <button class="btn ghost sm">Download</button></div>`;
+  document.getElementById('docs1').innerHTML =
+    doc('Rental agreement','VP-R-2026-00187 · signed 12 Jan 2026 · PDF 412 KB') +
+    doc('Vehicle inspection form','Handover condition report · 12 Jan 2026 · PDF 1.2 MB') +
+    doc('Insurance certificate','Policy MSIG-4471029 · expires 11 Jan 2027 · PDF 208 KB') +
+    doc('Roadside assistance','24/7 contact card · +65 6100 2424 · PDF 96 KB');
+  document.getElementById('docs2').innerHTML =
+    doc('Invoice VP-INV-2026-004312','Period 10–16 Aug 2026 · S$840.00 · unpaid') +
+    doc('Receipt VP-RCP-2026-002145','03 Aug 2026 · S$800.00') +
+    doc('Receipt VP-RCP-2026-002098','27 Jul 2026 · S$800.00') +
+    doc('Receipt VP-RCP-2026-002051','20 Jul 2026 · S$800.00');
+}
+/* A deterministic block pattern standing in for the real QR image, which the
+   API renders from the EMVCo payload built in packages/shared/src/paynow.ts. */
+function renderQr(){
+  const n = 21, box = document.getElementById('qrbox');
+  let s = 0x5f3a, cells = '';
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++){
+    s = (s * 1103515245 + 12345) & 0x7fffffff;
+    const finder = (x<7&&y<7)||(x>n-8&&y<7)||(x<7&&y>n-8);
+    const ring = finder && !((x%6===0||y%6===0)===false && ((x>1&&x<5&&y>1&&y<5)||(x>n-6&&x<n-2&&y>1&&y<5)||(x>1&&x<5&&y>n-6&&y<n-2))===false);
+    const on = finder ? ((x===0||x===6||y===0||y===6||(x>1&&x<5&&y>1&&y<5)) ||
+      (x>n-8&&((x===n-7||x===n-1||y===0||y===6)||(x>n-6&&x<n-2&&y>1&&y<5))) ||
+      (y>n-8&&((x===0||x===6||y===n-7||y===n-1)||(x>1&&x<5&&y>n-6&&y<n-2)))) : (s & 1);
+    if (on) cells += `<rect x="${x}" y="${y}" width="1" height="1"/>`;
+  }
+  box.innerHTML = `<svg viewBox="0 0 ${n} ${n}" width="100%" height="100%" shape-rendering="crispEdges" fill="#111614">${cells}</svg>`;
+}
+
+renderNav(); renderCollections(); renderVehicles(); renderQueue(); renderPortal(); renderQr();
+</script>
+</body>
+</html>
