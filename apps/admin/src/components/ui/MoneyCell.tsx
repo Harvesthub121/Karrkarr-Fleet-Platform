@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import type { Money } from '@vida/shared';
+import type { Money } from '@karrkarr/shared';
 
 interface MoneyCellProps {
   value: Money;
