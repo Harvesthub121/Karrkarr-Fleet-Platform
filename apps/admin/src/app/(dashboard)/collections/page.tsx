@@ -9,8 +9,8 @@ import { Can } from '@/lib/permissions';
 import { useToast } from '@/components/ui/Toast';
 import { Modal } from '@/components/ui/Modal';
 import { cn, formatDate } from '@/lib/utils';
-import { PERMISSIONS } from '@vida/shared';
-import type { CollectionsSummary, CollectionsRow, Paginated, Money } from '@vida/shared';
+import { PERMISSIONS } from '@karrkarr/shared';
+import type { CollectionsSummary, CollectionsRow, Paginated, Money } from '@karrkarr/shared';
 
 // ---- Bucket config --------------------------------------------------------
 
@@ -204,10 +204,10 @@ export default function CollectionsPage() {
 
   useEffect(() => {
     try {
-      const raw = sessionStorage.getItem('vida_admin_session');
+      const raw = sessionStorage.getItem('karrkarr_admin_session');
       if (raw) {
         const u = JSON.parse(raw);
-        const { ROLE_PERMISSIONS } = require('@vida/shared');
+        const { ROLE_PERMISSIONS } = require('@karrkarr/shared');
         const perms: string[] = ROLE_PERMISSIONS[u.role] ?? [];
         setCanAct(perms.includes(PERMISSIONS.COLLECTIONS_ACTION));
       }
