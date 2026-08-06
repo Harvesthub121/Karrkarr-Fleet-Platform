@@ -6,7 +6,7 @@ import { PaginationDto } from '../../common/dto/pagination.dto';
 import { AdminJwtGuard } from '../auth/guards/admin-jwt.guard';
 import { PermissionsGuard } from '../auth/guards/permissions.guard';
 import { RequirePermissions } from '../auth/decorators/require-permissions.decorator';
-import { PERMISSIONS } from '@vida/shared';
+import { PERMISSIONS } from '@karrkarr/shared';
 
 @ApiTags('users')
 @ApiBearerAuth('AdminJWT')
