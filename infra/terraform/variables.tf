@@ -13,7 +13,7 @@ variable "aws_region" {
 variable "project" {
   description = "Project identifier used in resource names and tags"
   type        = string
-  default     = "vida-fleet"
+  default     = "karrkarr-fleet"
 }
 
 # ── VPC ───────────────────────────────────────────────────────────────────────
@@ -41,13 +41,13 @@ variable "db_instance_class" {
 variable "db_name" {
   description = "PostgreSQL database name"
   type        = string
-  default     = "vida_fleet"
+  default     = "karrkarr_fleet"
 }
 
 variable "db_username" {
   description = "PostgreSQL master username"
   type        = string
-  default     = "vida"
+  default     = "karrkarr"
 }
 
 variable "db_password" {
@@ -113,7 +113,7 @@ variable "worker_memory_mb" {
 variable "api_image_uri" {
   description = "ECR image URI for the API container"
   type        = string
-  # e.g. "123456789.dkr.ecr.ap-southeast-1.amazonaws.com/vida-api:latest"
+  # e.g. "123456789.dkr.ecr.ap-southeast-1.amazonaws.com/karrkarr-api:latest"
 }
 
 variable "worker_image_uri" {
@@ -124,7 +124,7 @@ variable "worker_image_uri" {
 # ── ALB / ACM ─────────────────────────────────────────────────────────────────
 
 variable "domain_name" {
-  description = "Root domain name for ACM certificate (e.g. vidapartners.com.sg)"
+  description = "Root domain name for ACM certificate (e.g. karrkarr.com.sg)"
   type        = string
 }
 
