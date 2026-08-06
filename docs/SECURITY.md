@@ -58,7 +58,7 @@ Customer IDs are CUIDs (collision-resistant, non-sequential), not sequential int
 
 ## PDPA Considerations
 
-Vida Partners holds the following personal data subject to the Singapore Personal Data Protection Act 2012:
+Karrkarr holds the following personal data subject to the Singapore Personal Data Protection Act 2012:
 
 | Data              | Where stored                   | Access control                        |
 |-------------------|--------------------------------|---------------------------------------|
@@ -75,7 +75,7 @@ Vida Partners holds the following personal data subject to the Singapore Persona
 
 **Audit trail:** Every mutating request writes an `AuditLog` row. The before/after diff is redacted of NRIC and other sensitive fields before persistence. This supports the PDPA obligation to be able to account for how personal data was accessed and modified.
 
-**Data retention:** The PDPA requires that personal data is not retained longer than necessary. This system does not implement automated retention/purge schedules. Vida Partners should define a retention policy (e.g. 7 years for financial records, 2 years for inactive customer records) and either implement a purge job or handle deletion manually.
+**Data retention:** The PDPA requires that personal data is not retained longer than necessary. This system does not implement automated retention/purge schedules. Karrkarr should define a retention policy (e.g. 7 years for financial records, 2 years for inactive customer records) and either implement a purge job or handle deletion manually.
 
 **Access requests (DSAR):** If a customer requests access to or erasure of their data, this must be handled manually by SUPER_ADMIN. The system does not have a self-service DSAR workflow.
 
@@ -89,12 +89,12 @@ In production (AWS), all secrets are stored in AWS Secrets Manager and injected 
 
 | Secret                    | Secrets Manager path                    |
 |---------------------------|-----------------------------------------|
-| DATABASE_URL              | vida-fleet/prod/DATABASE_URL            |
-| JWT_ADMIN_SECRET          | vida-fleet/prod/JWT_ADMIN_SECRET        |
-| JWT_CUSTOMER_SECRET       | vida-fleet/prod/JWT_CUSTOMER_SECRET     |
+| DATABASE_URL              | karrkarr-fleet/prod/DATABASE_URL            |
+| JWT_ADMIN_SECRET          | karrkarr-fleet/prod/JWT_ADMIN_SECRET        |
+| JWT_CUSTOMER_SECRET       | karrkarr-fleet/prod/JWT_CUSTOMER_SECRET     |
 | AWS_ACCESS_KEY_ID/SECRET  | Not needed in ECS — use IAM task roles  |
-| RESEND_API_KEY            | vida-fleet/prod/RESEND_API_KEY          |
-| REDIS_URL                 | vida-fleet/prod/REDIS_URL               |
+| RESEND_API_KEY            | karrkarr-fleet/prod/RESEND_API_KEY          |
+| REDIS_URL                 | karrkarr-fleet/prod/REDIS_URL               |
 
 The API task and worker task use separate IAM task roles with least-privilege policies. The API task role needs S3 read/write on the documents bucket and Secrets Manager read. The worker task role needs the same minus S3 write (workers do not upload documents).
 
@@ -148,7 +148,7 @@ Audit logs are immutable in the application layer — no DELETE or UPDATE operat
 
 ## Pre-Go-Live Security Checklist
 
-- [ ] Rotate all seed credentials. The seed password `Vida@2026!` must not exist in production.
+- [ ] Rotate all seed credentials. The seed password `Karrkarr@2026!` must not exist in production.
 - [ ] Set `JWT_ADMIN_SECRET` and `JWT_CUSTOMER_SECRET` to cryptographically random values of at least 64 characters (e.g. `openssl rand -hex 64`). Store in Secrets Manager.
 - [ ] Confirm S3 bucket has public access block enabled and no public bucket policy.
 - [ ] Add MIME type validation to presigned PUT URL endpoint.
