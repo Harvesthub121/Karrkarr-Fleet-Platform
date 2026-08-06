@@ -4,11 +4,11 @@ import { formatDate, daysUntil } from '@/lib/utils';
 import { CardSkeleton } from '@/components/ui/Skeleton';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { ApiError } from '@/lib/api-client';
-import type { CustomerDashboard } from '@vida/shared';
+import type { CustomerDashboard } from '@karrkarr/shared';
 import { VehicleGallery } from './VehicleGallery';
 import Link from 'next/link';
 
-export const metadata = { title: 'Dashboard — Vida Partners Portal' };
+export const metadata = { title: 'Dashboard — Karrkarr Portal' };
 export const dynamic = 'force-dynamic';
 
 async function DashboardContent() {
