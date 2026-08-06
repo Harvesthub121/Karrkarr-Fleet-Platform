@@ -133,7 +133,7 @@ export function Sidebar() {
               <path d="M2 10V6l4-4 4 4v4H8V7H4v3H2z" fill="white" />
             </svg>
           </div>
-          <span className="text-sm font-semibold text-white tracking-tight">Vida Fleet</span>
+          <span className="text-sm font-semibold text-white tracking-tight">Karrkarr Fleet</span>
         </div>
       </div>
 
