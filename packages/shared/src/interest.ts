@@ -3,7 +3,7 @@
  * ============================
  *
  * This is the highest-risk logic in the platform: it decides how much money
- * Vida Partners asks a customer for. It is a pure function so it can be tested
+ * Karrkarr asks a customer for. It is a pure function so it can be tested
  * exhaustively without a database.
  *
  * THE RULE (signed off by the client, 6 Aug 2026):
