@@ -10,7 +10,7 @@ import { Job } from 'bullmq';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { PolicyService } from '../../policy/policy.service';
 import { InvoiceService } from '../../billing/invoice.service';
-import { POLICY_KEYS } from '@vida/shared';
+import { POLICY_KEYS } from '@karrkarr/shared';
 import { QUEUE_NAMES } from '../jobs.module';
 
 function sgtToday(): Date {
