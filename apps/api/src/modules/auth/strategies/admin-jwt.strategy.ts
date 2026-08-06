@@ -3,7 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { RequestContext } from '../../../common/request-context/request-context';
-import { isBranchScoped } from '@vida/shared';
+import { isBranchScoped } from '@karrkarr/shared';
 
 export interface AdminJwtPayload {
   sub: string;
@@ -25,7 +25,7 @@ export class AdminJwtStrategy extends PassportStrategy(Strategy, ADMIN_JWT_STRAT
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: process.env.JWT_ADMIN_SECRET ?? 'fallback-change-me',
-      audience: 'vida:admin',
+      audience: 'karrkarr:admin',
     });
   }
 
