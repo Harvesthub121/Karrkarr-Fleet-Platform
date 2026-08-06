@@ -1,5 +1,5 @@
 import { cn, VEHICLE_STATUS_CONFIG, INVOICE_STATUS_CONFIG } from '@/lib/utils';
-import type { VehicleStatusName, InvoiceStatusName } from '@vida/shared';
+import type { VehicleStatusName, InvoiceStatusName } from '@karrkarr/shared';
 
 interface VehicleStatusBadgeProps {
   status: VehicleStatusName;
