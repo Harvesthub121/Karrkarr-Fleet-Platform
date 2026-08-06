@@ -1,5 +1,5 @@
 {
-  "name": "@vida/portal",
+  "name": "@karrkarr/portal",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -10,7 +10,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@vida/shared": "workspace:*",
+    "@karrkarr/shared": "workspace:*",
     "next": "15.3.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
