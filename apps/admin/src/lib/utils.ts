@@ -1,7 +1,7 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { differenceInDays, format, parseISO } from 'date-fns';
-import type { Money, VehicleStatusName, InvoiceStatusName } from '@vida/shared';
+import type { Money, VehicleStatusName, InvoiceStatusName } from '@karrkarr/shared';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
