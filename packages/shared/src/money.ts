@@ -1,5 +1,5 @@
 /**
- * Money primitives for the Vida Partners platform.
+ * Money primitives for the Karrkarr platform.
  *
  * RULE: every monetary value in this system is an integer number of SGD cents
  * held in a `bigint`. Floating point never touches the billing path. If you
