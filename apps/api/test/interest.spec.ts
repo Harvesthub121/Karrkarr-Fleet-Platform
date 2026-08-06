@@ -11,9 +11,9 @@ import {
   toUtcMidnight,
   isoDate,
   type AccrualInput,
-} from '@vida/shared';
+} from '@karrkarr/shared';
 
-const RATE_100BPS: import('@vida/shared').InterestPolicy = {
+const RATE_100BPS: import('@karrkarr/shared').InterestPolicy = {
   dailyRateBps: 100, // 1%/day
   gracePeriodDays: 3,
 };
