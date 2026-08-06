@@ -82,7 +82,10 @@ export interface UploadPresignResponse {
 
 // ─── Session-aware fetch wrapper ──────────────────────────────────────────────
 
-async function authFetch<T>(path: string, opts: Parameters<typeof apiFetch>[1]): Promise<T> {
+async function authFetch<T>(
+  path: string,
+  opts: Omit<Parameters<typeof apiFetch>[1], 'accessToken' | 'refreshToken'>,
+): Promise<T> {
   const session = await getSession();
   if (!session) redirect('/login');
 
