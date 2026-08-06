@@ -1,8 +1,8 @@
 'use client';
 
 import { useContext, createContext, type ReactNode, useState, useEffect } from 'react';
-import { ROLE_PERMISSIONS, type Permission } from '@vida/shared';
-import type { AdminRoleName, AuthedAdmin } from '@vida/shared';
+import { ROLE_PERMISSIONS, type Permission } from '@karrkarr/shared';
+import type { AdminRoleName, AuthedAdmin } from '@karrkarr/shared';
 
 // ---------------------------------------------------------------------------
 // Session context
