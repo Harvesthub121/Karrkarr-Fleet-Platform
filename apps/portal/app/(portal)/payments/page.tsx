@@ -7,16 +7,16 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { ApiError } from '@/lib/api-client';
 import { CopyButton } from '@/components/ui/CopyButton';
 import { PaymentModal } from './PaymentModal';
-import type { CustomerDashboard } from '@vida/shared';
+import type { CustomerDashboard } from '@karrkarr/shared';
 import type { CustomerInvoice } from '@/lib/api';
 
-export const metadata = { title: 'Payment Centre — Vida Partners Portal' };
+export const metadata = { title: 'Payment Centre — Karrkarr Portal' };
 export const dynamic = 'force-dynamic';
 
 const BANK_NAME = 'DBS Bank';
 const BANK_ACCOUNT = '003-919874-0';
 const BANK_UEN = '202312345A';
-const PAYNOW_NAME = 'VIDA PARTNERS PTE LTD';
+const PAYNOW_NAME = 'KARRKARR PTE LTD';
 
 async function PaymentsContent() {
   let dashboard: CustomerDashboard;
