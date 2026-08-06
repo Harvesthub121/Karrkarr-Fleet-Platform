@@ -5,7 +5,7 @@
 
 resource "aws_secretsmanager_secret" "database_url" {
   name                    = "${local.name_prefix}/DATABASE_URL"
-  description             = "PostgreSQL connection string for the Vida Fleet API"
+  description             = "PostgreSQL connection string for the Karrkarr Fleet API"
   recovery_window_in_days = 7
 
   tags = { Name = "${local.name_prefix}/DATABASE_URL" }
