@@ -1,6 +1,6 @@
 # Deployment Runbook — AWS ap-southeast-1
 
-This document is the step-by-step guide for deploying the Vida Partners Fleet Platform to AWS. It is written for an ops person who has basic AWS console access and can follow instructions. Each step includes what to do and why.
+This document is the step-by-step guide for deploying the Karrkarr Fleet Platform to AWS. It is written for an ops person who has basic AWS console access and can follow instructions. Each step includes what to do and why.
 
 ## Architecture Overview
 
@@ -9,17 +9,17 @@ Route53 → ACM cert
     ↓
 ALB (HTTPS:443, HTTP:80 redirect)
     ↓
-ECS Fargate Cluster (vida-fleet)
-    ├── API Service (vida-api)         ← scales with HTTP traffic
-    └── Worker Service (vida-worker)   ← fixed 1 task, never scales with web
+ECS Fargate Cluster (karrkarr-fleet)
+    ├── API Service (karrkarr-api)         ← scales with HTTP traffic
+    └── Worker Service (karrkarr-worker)   ← fixed 1 task, never scales with web
     ↓
-RDS PostgreSQL Multi-AZ (vida-fleet-db)
-ElastiCache Redis (vida-fleet-cache)
-S3 bucket (vida-fleet-documents-prod)
+RDS PostgreSQL Multi-AZ (karrkarr-fleet-db)
+ElastiCache Redis (karrkarr-fleet-cache)
+S3 bucket (karrkarr-fleet-documents-prod)
 
 Vercel (or AWS Amplify)
-    ├── Admin dashboard (admin.vidapartners.com.sg)
-    └── Customer portal (portal.vidapartners.com.sg)
+    ├── Admin dashboard (admin.karrkarr.com.sg)
+    └── Customer portal (portal.karrkarr.com.sg)
 ```
 
 **Why separate API and Worker services:** The nightly jobs (interest accrual, invoice generation) run in the worker. If the API auto-scales under load, we do not want 10 worker tasks all running the interest accrual job simultaneously. The worker has exactly 1 task. It consumes from the Redis-backed BullMQ queues, which serialise execution.
@@ -34,7 +34,7 @@ Before starting, you need:
 - Terraform >= 1.6 installed
 - Domain name managed in Route53 (or transferrable to Route53)
 - Resend account with a verified sending domain
-- PayNow UEN from Vida's bank
+- PayNow UEN from Karrkarr's bank
 
 ---
 
@@ -52,13 +52,13 @@ terraform init
 terraform plan \
   -var="environment=prod" \
   -var="db_password=CHANGE_ME" \
-  -var="domain_name=vidapartners.com.sg"
+  -var="domain_name=karrkarr.com.sg"
 
 # Apply (this creates real resources and will incur costs)
 terraform apply \
   -var="environment=prod" \
   -var="db_password=CHANGE_ME" \
-  -var="domain_name=vidapartners.com.sg"
+  -var="domain_name=karrkarr.com.sg"
 ```
 
 Terraform creates:
@@ -81,11 +81,11 @@ After Terraform runs, go to AWS Secrets Manager in ap-southeast-1 and set values
 
 | Secret name                      | Value to set                                         |
 |----------------------------------|------------------------------------------------------|
-| vida-fleet/prod/DATABASE_URL     | `postgresql://vida:<password>@<rds-endpoint>:5432/vida_fleet?schema=public&sslmode=require` |
-| vida-fleet/prod/JWT_ADMIN_SECRET | Random 64-char hex: `openssl rand -hex 64`           |
-| vida-fleet/prod/JWT_CUSTOMER_SECRET | Random 64-char hex: `openssl rand -hex 64`        |
-| vida-fleet/prod/REDIS_URL        | `redis://<elasticache-endpoint>:6379`                |
-| vida-fleet/prod/RESEND_API_KEY   | From your Resend dashboard                           |
+| karrkarr-fleet/prod/DATABASE_URL     | `postgresql://karrkarr:<password>@<rds-endpoint>:5432/karrkarr_fleet?schema=public&sslmode=require` |
+| karrkarr-fleet/prod/JWT_ADMIN_SECRET | Random 64-char hex: `openssl rand -hex 64`           |
+| karrkarr-fleet/prod/JWT_CUSTOMER_SECRET | Random 64-char hex: `openssl rand -hex 64`        |
+| karrkarr-fleet/prod/REDIS_URL        | `redis://<elasticache-endpoint>:6379`                |
+| karrkarr-fleet/prod/RESEND_API_KEY   | From your Resend dashboard                           |
 
 Do not set AWS credentials here — the ECS tasks use IAM task roles.
 
@@ -102,13 +102,13 @@ aws ecr get-login-password --region ap-southeast-1 | \
   ACCOUNT_ID.dkr.ecr.ap-southeast-1.amazonaws.com
 
 # Build the API image
-docker build -t vida-api ./apps/api
+docker build -t karrkarr-api ./apps/api
 
 # Tag and push
-docker tag vida-api:latest \
-  ACCOUNT_ID.dkr.ecr.ap-southeast-1.amazonaws.com/vida-api:latest
+docker tag karrkarr-api:latest \
+  ACCOUNT_ID.dkr.ecr.ap-southeast-1.amazonaws.com/karrkarr-api:latest
 docker push \
-  ACCOUNT_ID.dkr.ecr.ap-southeast-1.amazonaws.com/vida-api:latest
+  ACCOUNT_ID.dkr.ecr.ap-southeast-1.amazonaws.com/karrkarr-api:latest
 ```
 
 Repeat for the worker image if it has a separate Dockerfile. If using the same image with a different CMD, update the ECS task definition accordingly.
@@ -121,11 +121,11 @@ Migrations must run before the API starts serving traffic. The safest way is to 
 
 ```bash
 aws ecs run-task \
-  --cluster vida-fleet \
-  --task-definition vida-api-migrate \
+  --cluster karrkarr-fleet \
+  --task-definition karrkarr-api-migrate \
   --launch-type FARGATE \
   --network-configuration "awsvpcConfiguration={subnets=[subnet-xxx],securityGroups=[sg-xxx],assignPublicIp=DISABLED}" \
-  --overrides '{"containerOverrides":[{"name":"vida-api","command":["npx","prisma","migrate","deploy"]}]}'
+  --overrides '{"containerOverrides":[{"name":"karrkarr-api","command":["npx","prisma","migrate","deploy"]}]}'
 ```
 
 Wait for the task to reach STOPPED state and check CloudWatch logs for success before proceeding.
@@ -141,13 +141,13 @@ Update the ECS services to use the new image:
 ```bash
 # Force a new deployment (pulls the latest image)
 aws ecs update-service \
-  --cluster vida-fleet \
-  --service vida-api \
+  --cluster karrkarr-fleet \
+  --service karrkarr-api \
   --force-new-deployment
 
 aws ecs update-service \
-  --cluster vida-fleet \
-  --service vida-worker \
+  --cluster karrkarr-fleet \
+  --service karrkarr-worker \
   --force-new-deployment
 ```
 
@@ -161,7 +161,7 @@ Watch the deployment in the ECS console. Both services should reach a RUNNING st
 
 1. Connect the `apps/admin` and `apps/customer` directories to two Vercel projects.
 2. Set environment variables in each Vercel project:
-   - `NEXT_PUBLIC_API_URL=https://api.vidapartners.com.sg`
+   - `NEXT_PUBLIC_API_URL=https://api.karrkarr.com.sg`
 3. Deploy via Vercel CI or `vercel deploy --prod`.
 
 ### AWS Amplify (alternative)
@@ -175,9 +175,9 @@ Watch the deployment in the ECS console. Both services should reach a RUNNING st
 ## Step 7: DNS Cutover
 
 1. In Route53, the ALB DNS name is in the Terraform outputs. Create:
-   - `api.vidapartners.com.sg` → ALB DNS (A record, alias)
-   - `admin.vidapartners.com.sg` → Vercel/Amplify CNAME
-   - `portal.vidapartners.com.sg` → Vercel/Amplify CNAME
+   - `api.karrkarr.com.sg` → ALB DNS (A record, alias)
+   - `admin.karrkarr.com.sg` → Vercel/Amplify CNAME
+   - `portal.karrkarr.com.sg` → Vercel/Amplify CNAME
 2. ACM certificate validation records were created by Terraform. Confirm the cert is `Issued` before cutover.
 3. Lower TTLs to 60 seconds before cutover and restore after.
 
@@ -192,13 +192,13 @@ All variables are injected from Secrets Manager or as ECS task definition enviro
 | DATABASE_URL             | Yes      | PostgreSQL connection string with SSL                |
 | PORT                     | Yes      | API listen port (3000)                               |
 | NODE_ENV                 | Yes      | `production`                                         |
-| CORS_ORIGINS             | Yes      | Comma-separated: `https://admin.vidapartners.com.sg,https://portal.vidapartners.com.sg` |
+| CORS_ORIGINS             | Yes      | Comma-separated: `https://admin.karrkarr.com.sg,https://portal.karrkarr.com.sg` |
 | JWT_ADMIN_SECRET         | Yes      | Minimum 64 chars, random                             |
 | JWT_CUSTOMER_SECRET      | Yes      | Minimum 64 chars, random                             |
 | JWT_ACCESS_TTL_SECONDS   | No       | Default 900 (15 min)                                 |
 | JWT_REFRESH_TTL_DAYS     | No       | Default 30                                           |
 | AWS_REGION               | Yes      | `ap-southeast-1`                                     |
-| S3_BUCKET                | Yes      | `vida-fleet-documents-prod`                          |
+| S3_BUCKET                | Yes      | `karrkarr-fleet-documents-prod`                          |
 | S3_PRESIGN_TTL_SECONDS   | No       | Default 3600                                         |
 | S3_ENDPOINT              | No       | Leave blank in production (MinIO only for local dev) |
 | REDIS_URL                | Yes      | ElastiCache Redis endpoint                           |
@@ -234,8 +234,8 @@ Terraform configures:
 To restore to a point in time:
 ```bash
 aws rds restore-db-instance-to-point-in-time \
-  --source-db-instance-identifier vida-fleet-db \
-  --target-db-instance-identifier vida-fleet-db-restored \
+  --source-db-instance-identifier karrkarr-fleet-db \
+  --target-db-instance-identifier karrkarr-fleet-db-restored \
   --restore-time 2026-08-06T02:00:00Z
 ```
 
@@ -304,14 +304,14 @@ This is a minimal footprint. Scale RDS instance size if query latency becomes an
 
 ### Things only the client can supply
 - [ ] AWS account created and billing alerts configured
-- [ ] Resend account created; sending domain `vidapartners.com.sg` verified (DKIM + SPF records added to DNS)
+- [ ] Resend account created; sending domain `karrkarr.com.sg` verified (DKIM + SPF records added to DNS)
 - [ ] Real PayNow UEN obtained from bank — update `paynow.uen` and `paynow.merchantName` in Policy settings after first login
 - [ ] Real bank account details — update `bank.*` policy settings
-- [ ] Domain `vidapartners.com.sg` accessible in Route53 or ready for NS delegation
+- [ ] Domain `karrkarr.com.sg` accessible in Route53 or ready for NS delegation
 - [ ] DNS TTLs lowered before cutover window
 
 ### Technical go-live steps
-- [ ] All seed passwords rotated (none of the `Vida@2026!` accounts exist in production)
+- [ ] All seed passwords rotated (none of the `Karrkarr@2026!` accounts exist in production)
 - [ ] Production JWT secrets set in Secrets Manager (64+ char random strings)
 - [ ] S3 bucket public access block confirmed enabled
 - [ ] RDS encryption at rest confirmed enabled
@@ -320,14 +320,14 @@ This is a minimal footprint. Scale RDS instance size if query latency becomes an
 - [ ] `prisma migrate deploy` completed successfully
 - [ ] API health check endpoint returns 200
 - [ ] Worker service showing 1 RUNNING task
-- [ ] Admin dashboard accessible at `admin.vidapartners.com.sg`
-- [ ] Customer portal accessible at `portal.vidapartners.com.sg`
+- [ ] Admin dashboard accessible at `admin.karrkarr.com.sg`
+- [ ] Customer portal accessible at `portal.karrkarr.com.sg`
 - [ ] Test end-to-end: create vehicle → create customer → create rental → generate invoice → submit payment → approve payment → verify ledger entry
 - [ ] CloudWatch alarms created and tested (trigger one intentionally)
 - [ ] Penetration test completed (or formally deferred with client sign-off)
-- [ ] UAT sign-off from Vida Partners operations manager
+- [ ] UAT sign-off from Karrkarr operations manager
 
-### UAT scenarios Vida must validate before go-live
+### UAT scenarios Karrkarr must validate before go-live
 - [ ] Admin can log in with all 5 roles and permissions behave as documented
 - [ ] Customer can receive invitation email, set password, and log in
 - [ ] Customer can view their invoice and scan the PayNow QR code in a real banking app
