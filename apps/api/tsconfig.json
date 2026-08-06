@@ -20,7 +20,7 @@
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true,
     "paths": {
-      "@vida/shared": ["../../packages/shared/src/index.ts"]
+      "@karrkarr/shared": ["../../packages/shared/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "dist", "test", "**/*.spec.ts"]
