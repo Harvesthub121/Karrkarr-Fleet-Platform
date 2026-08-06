@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
-import type { PolicyKey } from '@vida/shared';
+import type { PolicyKey } from '@karrkarr/shared';
 
 export class SetPolicyDto {
   @ApiProperty({ description: 'Policy key, e.g. "billing.interestRateBps"' })
