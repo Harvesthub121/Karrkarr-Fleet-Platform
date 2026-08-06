@@ -1,0 +1,58 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+dist/
+build/
+.next/
+out/
+
+# Environment files — NEVER commit these
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+apps/**/.env
+apps/**/.env.local
+
+# Prisma generated client (regenerated from schema on install)
+apps/api/src/generated/
+apps/api/node_modules/.prisma/
+
+# Terraform state — use remote backend (S3) for team use
+infra/terraform/.terraform/
+infra/terraform/.terraform.lock.hcl
+infra/terraform/terraform.tfstate
+infra/terraform/terraform.tfstate.backup
+infra/terraform/*.tfvars
+# Exception: keep example tfvars in git if you create one
+!infra/terraform/*.tfvars.example
+
+# Test output
+coverage/
+lcov.info
+*.lcov
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# TypeScript incremental compilation
+*.tsbuildinfo
+
+# Yarn (this project uses pnpm)
+.yarn/
+yarn.lock
