@@ -10,7 +10,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { formatSgd } from '@vida/shared';
+import { formatSgd } from '@karrkarr/shared';
 import * as ExcelJS from 'exceljs';
 import * as PDFDocument from 'pdfkit';
 
@@ -372,7 +372,7 @@ export class ReportsService {
       doc.on('end', () => resolve(Buffer.concat(chunks)));
       doc.on('error', reject);
 
-      doc.fontSize(16).text('Vida Partners Pte Ltd', { align: 'center' });
+      doc.fontSize(16).text('Karrkarr Pte Ltd', { align: 'center' });
       doc.fontSize(12).text(title, { align: 'center' });
       doc.moveDown();
 
