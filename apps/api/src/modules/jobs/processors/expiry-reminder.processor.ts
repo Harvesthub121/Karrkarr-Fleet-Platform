@@ -16,7 +16,7 @@ import { ExpiryType } from '@prisma/client';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { PolicyService } from '../../policy/policy.service';
 import { NotificationService } from '../../notifications/notification.service';
-import { POLICY_KEYS, parseDayLadder } from '@vida/shared';
+import { POLICY_KEYS, parseDayLadder } from '@karrkarr/shared';
 import { QUEUE_NAMES } from '../jobs.module';
 
 function sgtToday(): Date {
