@@ -27,7 +27,7 @@ export class HealthController {
   liveness() {
     return {
       status: 'ok',
-      service: 'vida-fleet-api',
+      service: 'karrkarr-fleet-api',
       uptimeSeconds: Math.round(process.uptime()),
       timestamp: new Date().toISOString(),
     };
