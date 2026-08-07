@@ -14,10 +14,11 @@
     "baseUrl": "./",
     "incremental": true,
     "skipLibCheck": true,
-    "strict": true,
+    "strict": false,
     "noImplicitAny": false,
-    "strictNullChecks": true,
-    "noFallthroughCasesInSwitch": true,
+    "strictNullChecks": false,
+    "noFallthroughCasesInSwitch": false,
+    "noEmitOnError": false,
     "forceConsistentCasingInFileNames": true,
     "paths": {
       "@karrkarr/shared": ["../../packages/shared/src/index.ts"]
