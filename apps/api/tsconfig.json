@@ -11,6 +11,7 @@
     "lib": ["ES2022"],
     "sourceMap": true,
     "outDir": "./dist",
+    "rootDir": "./src",
     "baseUrl": "./",
     "incremental": true,
     "skipLibCheck": true,
@@ -24,5 +25,6 @@
       "@karrkarr/shared": ["../../packages/shared/src/index.ts"]
     }
   },
-  "exclude": ["node_modules", "dist", "test", "**/*.spec.ts"]
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist", "test", "prisma", "**/*.spec.ts"]
 }
