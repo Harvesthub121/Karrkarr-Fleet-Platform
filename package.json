@@ -16,7 +16,8 @@
     "db:migrate": "pnpm --filter @karrkarr/api prisma:migrate",
     "db:seed": "pnpm --filter @karrkarr/api prisma:seed",
     "db:studio": "pnpm --filter @karrkarr/api prisma:studio",
-    "bootstrap": "pnpm install && pnpm db:up && sleep 5 && pnpm db:migrate && pnpm db:seed"
+    "bootstrap": "pnpm install && pnpm db:up && sleep 5 && pnpm db:migrate && pnpm db:seed",
+    "postinstall": "cd packages/shared && npx tsc --module commonjs --moduleResolution node --target ES2022 --outDir dist --declaration false --skipLibCheck true --esModuleInterop true || true"
   },
   "devDependencies": {
     "prettier": "^3.3.3",
