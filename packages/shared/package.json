@@ -1,17 +1,1 @@
-{
-  "name": "@karrkarr/shared",
-  "version": "1.0.0",
-  "private": true,
-  "main": "./dist/index.js",
-  "scripts": {
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "build": "tsc -p tsconfig.build.json",
-    "test:nodeps": "node --test ../../scripts/run-verify.mjs",
-    "verify": "node --test verify.test.ts"
-  },
-  "devDependencies": {
-    "typescript": "^5.6.3",
-    "vitest": "^2.1.4"
-  }
-}
+{"name":"@karrkarr/shared","version":"1.0.0","private":true,"main":"./dist/index.js","types":"./src/index.ts","scripts":{"typecheck":"tsc --noEmit","test":"vitest run","build":"tsc -p tsconfig.build.json","test:nodeps":"node --test ../../scripts/run-verify.mjs","verify":"node --test verify.test.ts"},"devDependencies":{"typescript":"^5.6.3","vitest":"^2.1.4"}}
