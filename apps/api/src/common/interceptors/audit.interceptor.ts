@@ -108,7 +108,7 @@ export class AuditInterceptor implements NestInterceptor {
           action: `${req.method.toLowerCase()}.${entityType}`,
           entityType,
           entityId,
-          after: body as Record<string, unknown>,
+          after: body as unknown as Record<string, unknown>,
           ipAddress: ctx?.ipAddress,
           userAgent: ctx?.userAgent,
         },
