@@ -15,7 +15,7 @@
  * Running this twice leaves the DB in the same state as running it once.
  */
 
-import { PrismaClient, BillingFrequency, LedgerEntryType, InvoiceStatus } from '@prisma/client';
+import { PrismaClient, Prisma, BillingFrequency, LedgerEntryType, InvoiceStatus } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import {
   calculateAccrual,
@@ -336,7 +336,7 @@ async function main() {
 
     // Create invoice
     const invoiceNo = await prisma.$queryRaw<[{ nextval: bigint }]>(
-      prisma.$queryRaw`SELECT nextval('karrkarr_invoice_seq')`,
+      Prisma.sql`SELECT nextval('karrkarr_invoice_seq')`,
     ).then((r: [{ nextval: bigint }]) => `KR-INV-2026-${Number(r[0].nextval).toString().padStart(6, '0')}`);
 
     const dueDate = daysAgo(s.invoiceDueDaysAgo);
