@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: karrkarr-api
+    runtime: node
+    region: oregon
+    plan: free
+    rootDir: .
+    buildCommand: npm install -g pnpm && pnpm install --frozen-lockfile && pnpm --filter @karrkarr/api build && pnpm --filter @karrkarr/api exec prisma generate
+    startCommand: node apps/api/dist/main.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
