@@ -87,17 +87,9 @@ export class InvoiceService {
       }
 
       // Freeze policy at issue time — changing the rate tomorrow must not affect this invoice
-      const interestRateBps = await this.policy.get(POLICY_KEYS.INTEREST_RATE_BPS, {
-        branchId: rental.branchId,
-        rentalId: rental.id,
-      });
-      const gracePeriodDays = await this.policy.get(POLICY_KEYS.GRACE_PERIOD_DAYS, {
-        branchId: rental.branchId,
-        rentalId: rental.id,
-      });
-      const paymentTermDays = await this.policy.get(POLICY_KEYS.INVOICE_PAYMENT_TERM_DAYS, {
-        branchId: rental.branchId,
-      });
+      const interestRateBps = await this.policy.get(POLICY_KEYS.INTEREST_RATE_BPS, rental.branchId);
+      const gracePeriodDays = await this.policy.get(POLICY_KEYS.GRACE_PERIOD_DAYS, rental.branchId);
+      const paymentTermDays = await this.policy.get(POLICY_KEYS.INVOICE_PAYMENT_TERM_DAYS, rental.branchId);
 
       const dueDate = new Date(input.issueDate);
       dueDate.setDate(dueDate.getDate() + Number(paymentTermDays));
