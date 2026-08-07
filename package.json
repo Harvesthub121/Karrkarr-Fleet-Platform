@@ -1,1 +1,32 @@
-ewogICJuYW1lIjogImthcnJrYXJyLWZsZWV0IiwKICAidmVyc2lvbiI6ICIxLjAuMCIsCiAgInByaXZhdGUiOiB0cnVlLAogICJkZXNjcmlwdGlvbiI6ICJLYXJya2FyciBQdGUgTHRkIOKAlCBGbGVldCBMZWFzaW5nIE1hbmFnZW1lbnQgUGxhdGZvcm0iLAogICJwYWNrYWdlTWFuYWdlciI6ICJwbnBtQDEwLjM0LjMiLAogICJlbmdpbmVzIjogewogICAgIm5vZGUiOiAiPj0yMC4xMS4wIgogIH0sCiAgInNjcmlwdHMiOiB7CiAgICAiZGV2IjogInBucG0gLXIgLS1wYXJhbGxlbCBkZXYiLAogICAgImJ1aWxkIjogInBucG0gLXIgYnVpbGQiLAogICAgInR5cGVjaGVjayI6ICJwbnBtIC1yIHR5cGVjaGVjayIsCiAgICAidGVzdCI6ICJwbnBtIC1yIHRlc3QiLAogICAgImxpbnQiOiAicG5wbSAtciBsaW50IiwKICAgICJkYjp1cCI6ICJkb2NrZXIgY29tcG9zZSAtZiBpbmZyYS9kb2NrZXItY29tcG9zZS55bWwgdXAgLWQgcG9zdGdyZXMgcmVkaXMiLAogICAgImRiOm1pZ3JhdGUiOiAicG5wbSAtLWZpbHRlciBAa2FycmthcnIvYXBpIHByaXNtYTptaWdyYXRlIiwKICAgICJkYjpzZWVkIjogInBucG0gLS1maWx0ZXIgQGthcnJrYXJyL2FwaSBwcmlzbWE6c2VlZCIsCiAgICAiZGI6c3R1ZGlvIjogInBucG0gLS1maWx0ZXIgQGthcnJrYXJyL2FwaSBwcmlzbWE6c3R1ZGlvIiwKICAgICJib290c3RyYXAiOiAicG5wbSBpbnN0YWxsICYmIHBucG0gZGI6dXAgJiYgc2xlZXAgNSAmJiBwbnBtIGRiOm1pZ3JhdGUgJiYgcG5wbSBkYjpzZWVkIgogIH0sCiAgImRldkRlcGVuZGVuY2llcyI6IHsKICAgICJwcmV0dGllciI6ICJeMy4zLjMiLAogICAgInR5cGVzY3JpcHQiOiAiXjUuNi4zIgogIH0sCiAgInBucG0iOiB7CiAgICAib3ZlcnJpZGVzIjogewogICAgICAiQHR5cGVzL3JlYWN0IjogIjE5LjIuNCIsCiAgICAgICJAdHlwZXMvcmVhY3QtZG9tIjogIjE5LjIuNCIKICAgIH0KICB9Cn0K
+{
+  "name": "karrkarr-fleet",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Karrkarr Pte Ltd Fleet Leasing Management Platform",
+  "packageManager": "pnpm@10.34.3",
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "lint": "pnpm -r lint",
+    "db:up": "docker compose -f infra/docker-compose.yml up -d postgres redis",
+    "db:migrate": "pnpm --filter @karrkarr/api prisma:migrate",
+    "db:seed": "pnpm --filter @karrkarr/api prisma:seed",
+    "db:studio": "pnpm --filter @karrkarr/api prisma:studio",
+    "bootstrap": "pnpm install && pnpm db:up && sleep 5 && pnpm db:migrate && pnpm db:seed"
+  },
+  "devDependencies": {
+    "prettier": "^3.3.3",
+    "typescript": "^5.6.3"
+  },
+  "pnpm": {
+    "overrides": {
+      "@types/react": "19.2.4",
+      "@types/react-dom": "19.2.4"
+    }
+  }
+}
