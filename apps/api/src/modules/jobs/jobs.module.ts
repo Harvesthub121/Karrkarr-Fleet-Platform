@@ -10,15 +10,7 @@ import { RiskScoringProcessor } from './processors/risk-scoring.processor';
 import { InvoiceGenerationProcessor } from './processors/invoice-generation.processor';
 import { JobsController } from './jobs.controller';
 import { JobsService } from './jobs.service';
-
-export const QUEUE_NAMES = {
-  PAYMENT_REMINDER: 'payment-reminder',
-  INTEREST_ACCRUAL: 'interest-accrual',
-  EXPIRY_REMINDER: 'expiry-reminder',
-  RENTAL_STATUS: 'rental-status',
-  RISK_SCORING: 'risk-scoring',
-  INVOICE_GENERATION: 'invoice-generation',
-} as const;
+import { QUEUE_NAMES } from './jobs.constants';
 
 @Module({
   imports: [
