@@ -44,7 +44,7 @@ async function bootstrap(): Promise<void> {
     allowedHeaders: ['Content-Type', 'Authorization'],
     // We do not use cookie-based sessions; exposing credentials: true would be
     // over-broad and could enable CSRF with wildcard origins in misconfiguration
-    credentials: false,
+    credentials: true,
   });
 
   // ---------------------------------------------------------------------------
