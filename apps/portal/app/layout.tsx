@@ -10,7 +10,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: 'Karrkarr — Customer Portal',
-  description: 'Manage your car rental, payments and documents.',
+  description: 'Manage your vehicle lease, payments and documents.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
