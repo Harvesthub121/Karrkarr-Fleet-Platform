@@ -71,7 +71,7 @@ export function parseSgdToCents(input: string): Cents {
   }
   const negative = cleaned.startsWith('-');
   const [dollars, fraction = ''] = cleaned.replace('-', '').split('.');
-  const cents = BigInt(dollars) * 100n + BigInt(fraction.padEnd(2, '0'));
+  const cents = BigInt(dollars ?? '0') * 100n + BigInt(fraction.padEnd(2, '0'));
   return negative ? -cents : cents;
 }
 
