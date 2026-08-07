@@ -72,7 +72,17 @@ export class AuthService {
       data: { lastLoginAt: new Date() },
     });
 
-    return this.issueAdminTokens(user, ip, ua);
+    const tokens = await this.issueAdminTokens(user, ip, ua);
+    const admin = {
+      id: user.id,
+      email: user.email,
+      fullName: user.fullName,
+      role: user.role,
+      branchId: user.branchId ?? null,
+      branchName: null,
+      permissions: (ROLE_PERMISSIONS as Record<string, string[]>)[user.role] ?? [],
+    };
+    return { tokens, admin } as any;
   }
 
   // ---------------------------------------------------------------------------
