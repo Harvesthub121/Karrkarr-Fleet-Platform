@@ -139,4 +139,15 @@ export class S3Service {
       return null;
     }
   }
+
+  async upload(params: { key: string; body: Buffer; contentType: string }): Promise<void> {
+    const cmd = new PutObjectCommand({
+      Bucket: this.bucket,
+      Key: params.key,
+      Body: params.body,
+      ContentType: params.contentType,
+      ServerSideEncryption: 'AES256',
+    });
+    await this.client.send(cmd);
+  }
 }
