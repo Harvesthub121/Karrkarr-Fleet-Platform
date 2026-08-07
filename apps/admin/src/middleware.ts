@@ -16,8 +16,8 @@ export function middleware(request: NextRequest) {
   }
 
   // Check for session cookie. The API sets an httpOnly `vida_access` cookie on login.
-  // We use a non-httpOnly `vida_authed` flag cookie so middleware can read it.
-  const authed = request.cookies.get('vida_authed');
+  // We use a non-httpOnly `karrkarr_authed` flag cookie so middleware can read it.
+  const authed = request.cookies.get('karrkarr_authed');
   if (!authed?.value) {
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('redirect', pathname);
