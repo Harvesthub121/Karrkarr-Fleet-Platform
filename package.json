@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "private": true,
   "description": "Karrkarr Pte Ltd Fleet Leasing Management Platform",
-  "packageManager": "pnpm@9.12.0",
   "engines": {
     "node": ">=20.11.0"
   },
