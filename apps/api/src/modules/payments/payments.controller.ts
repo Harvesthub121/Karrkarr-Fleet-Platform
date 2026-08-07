@@ -113,7 +113,7 @@ export class PaymentsController {
   async submitPayment(
     @Body() dto: SubmitPaymentDto,
     @CurrentUser() user: { id: string },
-    @UploadedFile() proof?: Express.Multer.File,
+    @UploadedFile() proof?: any,
   ) {
     return this.submissions.submitPayment({
       invoiceId: dto.invoiceId,
