@@ -17,7 +17,7 @@
     "db:seed": "pnpm --filter @karrkarr/api prisma:seed",
     "db:studio": "pnpm --filter @karrkarr/api prisma:studio",
     "bootstrap": "pnpm install && pnpm db:up && sleep 5 && pnpm db:migrate && pnpm db:seed",
-    "postinstall": "(cd packages/shared && ./node_modules/.bin/tsc --module commonjs --moduleResolution node --target ES2022 --outDir dist --declaration false --skipLibCheck true --esModuleInterop true 2>&1; true) && (cd apps/api && echo \"=NEST BIN CHECK=\" && ls node_modules/.bin/nest 2>&1 && echo \"=PRISMA GEN=\" && ./node_modules/.bin/prisma generate 2>&1 && echo \"=NEST BUILD START=\" && ./node_modules/.bin/nest build 2>&1 && echo \"=NEST BUILD DONE=\" && echo \"=DIST CONTENTS=\" && ls dist/ 2>&1 || echo \"=BUILD FAILED=\" && ls dist/ 2>&1 || echo NO-DIST)"
+    "postinstall": "(cd packages/shared && ./node_modules/.bin/tsc --module commonjs --moduleResolution node --target ES2022 --outDir dist --declaration false --skipLibCheck true --esModuleInterop true 2>&1; true) && (cd apps/api && ./node_modules/.bin/prisma generate 2>&1 && ./node_modules/.bin/prisma db push --accept-data-loss 2>&1 && ./node_modules/.bin/nest build 2>&1)"
   },
   "devDependencies": {
     "prettier": "^3.3.3",
