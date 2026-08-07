@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
-import { QUEUE_NAMES } from './jobs.module';
+import { QUEUE_NAMES } from './jobs.constants';
 
 @Injectable()
 export class JobsService {
