@@ -16,7 +16,7 @@ import { Logger } from '@nestjs/common';
 import { Job } from 'bullmq';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { InterestService } from '../../billing/interest.service';
-import { QUEUE_NAMES } from '../jobs.module';
+import { QUEUE_NAMES } from '../jobs.constants';
 
 @Processor(QUEUE_NAMES.INTEREST_ACCRUAL)
 export class InterestAccrualProcessor extends WorkerHost {
