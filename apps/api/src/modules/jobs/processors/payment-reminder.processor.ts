@@ -74,16 +74,16 @@ export class PaymentReminderProcessor extends WorkerHost {
     const daysOverdue = -daysUntilDue;
 
     const daysBefore = parseDayLadder(
-      String(await this.policy.get(POLICY_KEYS.REMINDER_DAYS_BEFORE, { branchId: invoice.branchId })),
+      String(await this.policy.get(POLICY_KEYS.REMINDER_DAYS_BEFORE, invoice.branchId)),
     );
     const overdueInterval = Number(
-      await this.policy.get(POLICY_KEYS.REMINDER_OVERDUE_INTERVAL_DAYS, { branchId: invoice.branchId }),
+      await this.policy.get(POLICY_KEYS.REMINDER_OVERDUE_INTERVAL_DAYS, invoice.branchId),
     );
     const overdueMax = Number(
-      await this.policy.get(POLICY_KEYS.REMINDER_OVERDUE_MAX_DAYS, { branchId: invoice.branchId }),
+      await this.policy.get(POLICY_KEYS.REMINDER_OVERDUE_MAX_DAYS, invoice.branchId),
     );
     const sendOnDueDate = String(
-      await this.policy.get(POLICY_KEYS.REMINDER_ON_DUE_DATE, { branchId: invoice.branchId }),
+      await this.policy.get(POLICY_KEYS.REMINDER_ON_DUE_DATE, invoice.branchId),
     ) === 'true';
 
     let reminderCode: string | null = null;
