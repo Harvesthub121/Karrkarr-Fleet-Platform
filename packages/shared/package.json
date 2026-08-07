@@ -1,0 +1,13 @@
+{
+  "name": "@karrkarr/shared",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "build": "tsc -p tsconfig.build.json",
+    "test:nodeps": "node --test ../../scripts/run-verify.mjs",
+    "verify": "node --test verify.test.ts"
+  }
+}
