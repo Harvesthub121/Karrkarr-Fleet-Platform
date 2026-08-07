@@ -76,9 +76,7 @@ export class InterestService {
     const outstandingPrincipalCents = invoice.principalCents - invoice.paidCents;
     const clampedPrincipal = outstandingPrincipalCents < 0n ? 0n : outstandingPrincipalCents;
 
-    const capBps = await this.policy.get(POLICY_KEYS.INTEREST_CAP_BPS, {
-      branchId: invoice.branchId,
-    });
+    const capBps = await this.policy.get(POLICY_KEYS.INTEREST_CAP_BPS, invoice.branchId);
 
     // Use rate frozen at invoice issue time — never re-read policy for old invoices
     const policy = {
