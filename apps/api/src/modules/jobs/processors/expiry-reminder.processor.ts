@@ -134,7 +134,7 @@ export class ExpiryReminderProcessor extends WorkerHost {
     if (daysRemaining < 0) return; // Already expired — different workflow
 
     const ladderRaw = String(
-      await this.policy.get(check.ladderKey as any, { branchId: vehicle.branchId }),
+      await this.policy.get(check.ladderKey as any, vehicle.branchId),
     );
     const ladder = parseDayLadder(ladderRaw);
 
