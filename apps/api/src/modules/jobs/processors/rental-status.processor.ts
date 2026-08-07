@@ -12,7 +12,7 @@ import { PrismaService } from '../../../prisma/prisma.service';
 import { PolicyService } from '../../policy/policy.service';
 import { NotificationService } from '../../notifications/notification.service';
 import { POLICY_KEYS } from '@karrkarr/shared';
-import { QUEUE_NAMES } from '../jobs.module';
+import { QUEUE_NAMES } from '../jobs.constants';
 
 function sgtToday(): Date {
   const now = new Date();
