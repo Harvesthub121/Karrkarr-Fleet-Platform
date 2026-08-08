@@ -124,10 +124,20 @@ const RentalAgreementIcon = (
   </svg>
 );
 
+// ClipboardList icon for Vehicle Handover
+const VehicleHandoverIcon = (
+  <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+    <rect x="2" y="2" width="11" height="12" rx="1" stroke="currentColor" strokeWidth="1.2" />
+    <path d="M5 2.5h5v2H5v-2z" stroke="currentColor" strokeWidth="1.1" strokeLinejoin="round" />
+    <path d="M4.5 7h6M4.5 9.5h6M4.5 12h4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+  </svg>
+);
+
 export function Sidebar() {
   const pathname = usePathname();
   const { user } = useSession();
   const canWriteRentals = useCan('rentals:write' as any);
+  const canReadVehicles = useCan('vehicles:read' as any);
 
   function isActive(href: string): boolean {
     if (href === '/') return pathname === '/';
@@ -179,6 +189,22 @@ export function Sidebar() {
           >
             {RentalAgreementIcon}
             Rental Agreement
+          </Link>
+        )}
+
+        {/* Vehicle Handover — shown only when user has vehicles read permission */}
+        {canReadVehicles && (
+          <Link
+            href="/vehicle-handover"
+            className={cn(
+              'flex items-center gap-2.5 px-4 py-2 text-xs font-medium transition-colors',
+              isActive('/vehicle-handover')
+                ? 'bg-teal-500/10 text-teal-400 border-r-2 border-teal-500'
+                : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800',
+            )}
+          >
+            {VehicleHandoverIcon}
+            Vehicle Handover
           </Link>
         )}
       </nav>
