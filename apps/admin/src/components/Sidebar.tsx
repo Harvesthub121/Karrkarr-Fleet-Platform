@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useSession } from '@/lib/permissions';
+import { useCan } from '@/lib/permissions';
 
 const NAV_ITEMS = [
   {
@@ -114,9 +115,19 @@ const NAV_ITEMS = [
   },
 ];
 
+// Document icon for Rental Agreement
+const RentalAgreementIcon = (
+  <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+    <path d="M3 2h6.5L12 4.5V13a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
+    <path d="M9 2v3h3" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
+    <path d="M5 7h5M5 9.5h3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+  </svg>
+);
+
 export function Sidebar() {
   const pathname = usePathname();
   const { user } = useSession();
+  const canWriteRentals = useCan('rentals:write' as any);
 
   function isActive(href: string): boolean {
     if (href === '/') return pathname === '/';
@@ -154,6 +165,22 @@ export function Sidebar() {
             {item.label}
           </Link>
         ))}
+
+        {/* Rental Agreement — shown only when user has rental write permission */}
+        {canWriteRentals && (
+          <Link
+            href="/rental-agreement"
+            className={cn(
+              'flex items-center gap-2.5 px-4 py-2 text-xs font-medium transition-colors',
+              isActive('/rental-agreement')
+                ? 'bg-teal-500/10 text-teal-400 border-r-2 border-teal-500'
+                : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800',
+            )}
+          >
+            {RentalAgreementIcon}
+            Rental Agreement
+          </Link>
+        )}
       </nav>
 
       {/* User footer */}
