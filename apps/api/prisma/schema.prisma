@@ -285,6 +285,7 @@ model Customer {
   documents     Document[]
   refreshTokens RefreshToken[]
   notifications Notification[]
+  creditRewards CreditReward[]
 
   @@index([branchId, isActive])
   @@index([riskScore])
@@ -576,6 +577,7 @@ model Invoice {
   payments      Payment[]
   reminders     ReminderLog[]
   documents     Document[]
+  creditRewards CreditReward[]
 
   @@index([customerId, status])
   @@index([branchId, status])
@@ -854,3 +856,21 @@ model AuditLog {
   @@index([actorAdminId, createdAt])
   @@index([action, createdAt])
 }
+
+model CreditReward {
+  id          String   @id @default(cuid())
+  customerId  String
+  invoiceId   String?
+  amountCents Int
+  type        String   // 'EARNED' | 'REDEEMED' | 'EXPIRED'
+  description String
+  daysEarlyPaid Int?
+  earnedAt    DateTime @default(now())
+  expiresAt   DateTime?
+  redeemedAt  DateTime?
+  createdAt   DateTime @default(now())
+
+  customer Customer @relation(fields: [customerId], references: [id])
+  invoice  Invoice? @relation(fields: [invoiceId], references: [id])
+}
+

@@ -8,6 +8,7 @@ import { classNames } from '@/lib/utils';
 const NAV_ITEMS = [
   { href: '/', label: 'Dashboard', icon: HomeIcon },
   { href: '/payments', label: 'Payments', icon: PaymentIcon },
+  { href: '/rewards', label: 'Rewards', icon: RewardsIcon },
   { href: '/documents', label: 'Documents', icon: DocumentIcon },
   { href: '/vehicle', label: 'Vehicle', icon: CarIcon },
   { href: '/profile', label: 'Profile', icon: UserIcon },
@@ -25,6 +26,14 @@ function PaymentIcon() {
   return (
     <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
       <path d="M2.5 4A1.5 1.5 0 001 5.5V6h18v-.5A1.5 1.5 0 0017.5 4h-15zM19 8.5H1v6A1.5 1.5 0 002.5 16h15a1.5 1.5 0 001.5-1.5v-6zM3 13.25a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5h-1.5a.75.75 0 01-.75-.75zm4.75-.75a.75.75 0 000 1.5h3.5a.75.75 0 000-1.5h-3.5z" />
+    </svg>
+  );
+}
+
+function RewardsIcon() {
+  return (
+    <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+      <path fillRule="evenodd" d="M10 1l2.39 4.84L18 6.76l-4 3.9.94 5.5L10 13.77l-4.94 2.39.94-5.5-4-3.9 5.61-.92L10 1z" clipRule="evenodd" />
     </svg>
   );
 }
@@ -122,7 +131,7 @@ export function NavBar({ fullName, customerRef }: NavBarProps) {
         className="fixed bottom-0 left-0 right-0 z-30 md:hidden border-t border-gray-200 bg-white"
         aria-label="Mobile navigation"
       >
-        <div className="grid grid-cols-5 h-16">
+        <div className="grid grid-cols-6 h-16">
           {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
             const active = href === '/' ? pathname === '/' : pathname.startsWith(href);
             return (
@@ -145,3 +154,4 @@ export function NavBar({ fullName, customerRef }: NavBarProps) {
     </>
   );
 }
+

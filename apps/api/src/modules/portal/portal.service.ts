@@ -250,4 +250,79 @@ export class PortalService {
     const url = await this.s3.presignedPut(key, mimeMap[cleanExt]);
     return { url, key };
   }
+
+  async getRewards(customerId: string) {
+    // Get current credit balance
+    const credits = await this.prisma.creditReward.findMany({
+      where: { customerId },
+      orderBy: { earnedAt: 'desc' },
+    });
+
+    const totalEarned = credits
+      .filter(c => c.type === 'EARNED')
+      .reduce((sum, c) => sum + c.amountCents, 0);
+
+    const totalRedeemed = credits
+      .filter(c => c.type === 'REDEEMED')
+      .reduce((sum, c) => sum + c.amountCents, 0);
+
+    const balance = totalEarned - totalRedeemed;
+
+    // Get upcoming invoice (soonest DUE or UPCOMING)
+    const upcomingInvoice = await this.prisma.invoice.findFirst({
+      where: {
+        customerId,
+        status: { in: ['UPCOMING', 'DUE'] },
+      },
+      orderBy: { dueDate: 'asc' },
+      select: {
+        id: true,
+        invoiceNo: true,
+        dueDate: true,
+        outstandingCents: true,
+        status: true,
+        principalCents: true,
+      },
+    });
+
+    return {
+      balance: { cents: balance, display: formatSgd(BigInt(balance)) },
+      totalEarned: { cents: totalEarned, display: formatSgd(BigInt(totalEarned)) },
+      totalRedeemed: { cents: totalRedeemed, display: formatSgd(BigInt(totalRedeemed)) },
+      upcomingInvoice,
+      history: credits.map(c => ({
+        ...c,
+        amountDisplay: formatSgd(BigInt(c.amountCents)),
+      })),
+    };
+  }
+
+  calculateEarlyPaymentCredit(dueDate: Date, paymentDate: Date): { creditCents: number; daysEarly: number; tier: string } {
+    const msPerDay = 1000 * 60 * 60 * 24;
+    const daysEarly = Math.floor((dueDate.getTime() - paymentDate.getTime()) / msPerDay);
+
+    let creditDollars = 0;
+    let tier = 'none';
+
+    if (daysEarly >= 30) {
+      creditDollars = 20;
+      tier = '30+ days';
+    } else if (daysEarly >= 15) {
+      creditDollars = 15 + ((daysEarly - 15) / 15) * 5;
+      tier = '15-29 days';
+    } else if (daysEarly >= 7) {
+      creditDollars = 10 + ((daysEarly - 7) / 8) * 5;
+      tier = '7-14 days';
+    } else {
+      creditDollars = 0;
+      tier = 'none';
+    }
+
+    return {
+      creditCents: Math.round(creditDollars * 100),
+      daysEarly: Math.max(0, daysEarly),
+      tier,
+    };
+  }
 }
+

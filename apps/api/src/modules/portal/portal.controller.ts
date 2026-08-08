@@ -10,6 +10,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
+import { ApiOperation } from '@nestjs/swagger';
 import { CustomerJwtGuard } from '../auth/guards/customer-jwt.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { PortalService } from './portal.service';
@@ -87,4 +88,24 @@ export class PortalController {
   getProofUploadUrl(@CurrentUser() user: CustomerJwtPayload, @Body() dto: ProofUploadUrlDto) {
     return this.portalService.getProofUploadUrl(user.sub, dto.ext);
   }
+
+  @Get('rewards')
+  @ApiOperation({ summary: 'Get customer reward credit balance and history' })
+  getRewards(@CurrentUser() user: { sub: string }) {
+    return this.portalService.getRewards(user.sub);
+  }
+
+  @Post('rewards/calculate')
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Calculate credit for early payment' })
+  calculateCredit(
+    @Body() body: { dueDate: string; paymentDate: string },
+    @CurrentUser() user: { sub: string },
+  ) {
+    return this.portalService.calculateEarlyPaymentCredit(
+      new Date(body.dueDate),
+      new Date(body.paymentDate),
+    );
+  }
 }
+
