@@ -18,6 +18,7 @@ import { MaintenanceModule } from './modules/maintenance/maintenance.module';
 import { RentalsModule } from './modules/rentals/rentals.module';
 import { DocumentsModule } from './modules/documents/documents.module';
 import { PolicyModule } from './modules/policy/policy.module';
+import { PortalModule } from './modules/portal/portal.module';
 
 // Modules owned by other engineers — imported so the DI graph is complete and
 // the monorepo builds as a unit; their files will exist when they write them.
@@ -102,6 +103,7 @@ import { HealthModule } from './modules/health/health.module';
     RentalsModule,
     DocumentsModule,
     PolicyModule,
+    PortalModule,
 
     // Other engineers' modules
     BillingModule,
