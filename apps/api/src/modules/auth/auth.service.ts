@@ -113,7 +113,14 @@ export class AuthService {
       data: { lastLoginAt: new Date() },
     });
 
-    return this.issueCustomerTokens(customer, ip, ua);
+    const tokens = await this.issueCustomerTokens(customer, ip, ua);
+    // Include customer profile so the portal can store session data without an extra round-trip
+    return { ...tokens, customer: {
+      id: customer.id,
+      customerRef: customer.customerRef,
+      email: customer.email,
+      fullName: customer.fullName,
+    } } as any;
   }
 
   // ---------------------------------------------------------------------------
