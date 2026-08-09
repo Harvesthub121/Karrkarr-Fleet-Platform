@@ -37,8 +37,8 @@ export default function NotificationsPage() {
 
   useEffect(() => {
     setLoading(true);
-    apiGet<Notification[]>('/notifications', { unreadOnly: filter === 'unread' || undefined })
-      .then(setNotifications)
+    apiGet<{ data: Notification[] }>('/notifications', { unreadOnly: filter === 'unread' || undefined })
+      .then(res => setNotifications(res.data ?? []))
       .catch(() => show('Failed to load notifications', 'error'))
       .finally(() => setLoading(false));
   }, [filter, show]);
