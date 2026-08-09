@@ -12,7 +12,7 @@ import { cn, formatDate } from '@/lib/utils';
 
 interface PaymentSubmission {
   id: string;
-  status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  status: 'PENDING_VERIFICATION' | 'APPROVED' | 'REJECTED';
   submittedAt: string;
   declaredAmountCents: number;
   transactionRef: string;
@@ -37,7 +37,7 @@ export default function PaymentsPage() {
   const { show } = useToast();
   const [submissions, setSubmissions] = useState<PaymentSubmission[]>([]);
   const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState<string>('PENDING');
+  const [statusFilter, setStatusFilter] = useState<string>('PENDING_VERIFICATION');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
@@ -108,7 +108,7 @@ export default function PaymentsPage() {
           <p className="text-xs text-zinc-500 mt-0.5">Review customer payment submissions</p>
         </div>
         <div className="flex gap-1">
-          {(['PENDING', 'APPROVED', 'REJECTED'] as const).map(s => (
+          {(['PENDING_VERIFICATION', 'APPROVED', 'REJECTED'] as const).map(s => (
             <button
               key={s}
               onClick={() => { setStatusFilter(s); setPage(1); }}
@@ -119,7 +119,7 @@ export default function PaymentsPage() {
                   : 'border-zinc-200 text-zinc-600 hover:bg-zinc-50',
               )}
             >
-              {s.charAt(0) + s.slice(1).toLowerCase()}
+              {s === 'PENDING_VERIFICATION' ? 'Pending' : s.charAt(0) + s.slice(1).toLowerCase()}
             </button>
           ))}
         </div>
@@ -207,7 +207,7 @@ export default function PaymentsPage() {
                       </a>
                     )}
 
-                    {sub.status === 'PENDING' && (
+                    {sub.status === 'PENDING_VERIFICATION' && (
                       <Can permission={PERMISSIONS.PAYMENT_VERIFY}>
                         <div className="flex gap-1">
                           <button
