@@ -1,11 +1,12 @@
 /**
  * Typed fetch wrapper with automatic JWT refresh on 401.
- * Access/refresh tokens are stored in httpOnly cookies set by the API;
- * the client only tracks whether a session exists via a lightweight
- * sessionStorage flag so we can redirect on hard-logouts.
+ * Access token is read from sessionStorage (karrkarr_admin_session) and
+ * attached as Authorization: Bearer header on every request.
  */
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000';
+
+const SESSION_KEY = 'karrkarr_admin_session';
 
 class ApiError extends Error {
   constructor(
@@ -18,15 +19,46 @@ class ApiError extends Error {
   }
 }
 
+function getSession(): { accessToken: string; refreshToken: string } | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = sessionStorage.getItem(SESSION_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function setSession(data: { accessToken: string; refreshToken: string }) {
+  if (typeof window === 'undefined') return;
+  const existing = getSession();
+  sessionStorage.setItem(SESSION_KEY, JSON.stringify({ ...existing, ...data }));
+}
+
+function clearSession() {
+  if (typeof window === 'undefined') return;
+  sessionStorage.removeItem(SESSION_KEY);
+}
+
 let refreshPromise: Promise<boolean> | null = null;
 
 async function refreshTokens(): Promise<boolean> {
   try {
+    const session = getSession();
+    if (!session?.refreshToken) return false;
     const res = await fetch(`${API_BASE}/auth/admin/refresh`, {
       method: 'POST',
-      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken: session.refreshToken }),
     });
-    return res.ok;
+    if (!res.ok) return false;
+    const data = await res.json();
+    const tokens = data.tokens ?? data;
+    if (tokens.accessToken) {
+      setSession({ accessToken: tokens.accessToken, refreshToken: tokens.refreshToken ?? session.refreshToken });
+      return true;
+    }
+    return false;
   } catch {
     return false;
   }
@@ -37,17 +69,21 @@ export async function apiFetch<T>(
   init: RequestInit = {},
   retry = true,
 ): Promise<T> {
+  const session = getSession();
+  const authHeader = session?.accessToken
+    ? { Authorization: `Bearer ${session.accessToken}` }
+    : {};
+
   const res = await fetch(`${API_BASE}${path}`, {
     ...init,
-    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
+      ...authHeader,
       ...(init.headers ?? {}),
     },
   });
 
   if (res.status === 401 && retry) {
-    // Deduplicate concurrent 401 refresh attempts
     if (!refreshPromise) {
       refreshPromise = refreshTokens().finally(() => {
         refreshPromise = null;
@@ -55,9 +91,9 @@ export async function apiFetch<T>(
     }
     const ok = await refreshPromise;
     if (ok) return apiFetch<T>(path, init, false);
-    // Hard logout: clear session flag and redirect
+    // Hard logout
+    clearSession();
     if (typeof window !== 'undefined') {
-      sessionStorage.removeItem('vida_admin_session');
       window.location.href = '/login';
     }
     throw new ApiError(401, null, 'Session expired');
@@ -69,7 +105,6 @@ export async function apiFetch<T>(
     throw new ApiError(res.status, body);
   }
 
-  // 204 No Content
   if (res.status === 204) return undefined as T;
 
   return res.json() as Promise<T>;
