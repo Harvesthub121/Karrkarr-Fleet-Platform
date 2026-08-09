@@ -1,0 +1,15 @@
+# Netlify configuration for Karrkarr Fleet Platform
+# This deploys the admin portal by default
+# To deploy customer portal instead, change base to "apps/portal"
+
+[build]
+  base = "apps/admin"
+  command = "pnpm --filter @karrkarr/admin build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+  PNPM_VERSION = "9.12.0"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
