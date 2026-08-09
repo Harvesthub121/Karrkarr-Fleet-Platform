@@ -115,29 +115,9 @@ const NAV_ITEMS = [
   },
 ];
 
-// Document icon for Rental Agreement
-const RentalAgreementIcon = (
-  <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-    <path d="M3 2h6.5L12 4.5V13a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
-    <path d="M9 2v3h3" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
-    <path d="M5 7h5M5 9.5h3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-  </svg>
-);
-
-// ClipboardList icon for Vehicle Handover
-const VehicleHandoverIcon = (
-  <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-    <rect x="2" y="2" width="11" height="12" rx="1" stroke="currentColor" strokeWidth="1.2" />
-    <path d="M5 2.5h5v2H5v-2z" stroke="currentColor" strokeWidth="1.1" strokeLinejoin="round" />
-    <path d="M4.5 7h6M4.5 9.5h6M4.5 12h4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-  </svg>
-);
-
 export function Sidebar() {
   const pathname = usePathname();
   const { user } = useSession();
-  const canWriteRentals = useCan('rentals:write' as any);
-  const canReadVehicles = useCan('vehicles:read' as any);
 
   function isActive(href: string): boolean {
     if (href === '/') return pathname === '/';
