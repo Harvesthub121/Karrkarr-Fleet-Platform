@@ -215,7 +215,7 @@ export default function CollectionsPage() {
   }, []);
 
   useEffect(() => {
-    apiGet<{ id: string; name: string }[]>('/branches').then(setBranches).catch(() => {});
+    apiGet<{ data: { id: string; name: string }[]; total: number }>('/branches').then(res => setBranches(res.data ?? [])).catch(() => {});
   }, []);
 
   const loadSummary = useCallback(() => {
