@@ -412,65 +412,63 @@ export class ReportsService {
   }
 
   async fleetOverview(branchId?: string): Promise<Record<string, unknown>> {
-    const branchFilter = branchId ? { branchId } : {};
-    const now = new Date();
-    const thirtyDaysLater = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    try {
+      const branchFilter = branchId ? { branchId } : {};
+      const now = new Date();
+      const thirtyDaysLater = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-    const [
-      totalVehicles,
-      availableVehicles,
-      currentlyRented,
-      inMaintenance,
-      returningSoon,
-      paymentsDueToday,
-      overduePayments,
-      upcomingServicing,
-      upcomingInspection,
-      insuranceExpiring,
-      roadTaxExpiring,
-      coeExpiring,
-      monthlyRevenue,
-      outstandingReceivables,
-    ] = await Promise.all([
-      this.prisma.vehicle.count({ where: { isActive: true, ...branchFilter } }),
-      this.prisma.vehicle.count({ where: { isActive: true, status: 'AVAILABLE', ...branchFilter } }),
-      this.prisma.vehicle.count({ where: { isActive: true, status: 'RENTED_OUT', ...branchFilter } }),
-      this.prisma.vehicle.count({ where: { isActive: true, status: { in: ['MAINTENANCE', 'CLEANING', 'INSPECTION', 'ACCIDENT_REPAIR'] }, ...branchFilter } }),
-      this.prisma.rentalAgreement.count({ where: { status: 'ENDING_SOON', ...branchFilter } }),
-      this.prisma.invoice.count({ where: { status: 'DUE', dueDate: { lte: now }, ...branchFilter } }),
-      this.prisma.invoice.count({ where: { status: 'OVERDUE', ...branchFilter } }),
-      this.prisma.vehicle.count({ where: { isActive: true, nextServiceDate: { lte: thirtyDaysLater }, ...branchFilter } }),
-      this.prisma.vehicle.count({ where: { isActive: true, inspectionDue: { lte: thirtyDaysLater }, ...branchFilter } }),
-      this.prisma.vehicle.count({ where: { isActive: true, insuranceExpiry: { lte: thirtyDaysLater }, ...branchFilter } }),
-      this.prisma.vehicle.count({ where: { isActive: true, roadTaxExpiry: { lte: thirtyDaysLater }, ...branchFilter } }),
-      this.prisma.vehicle.count({ where: { isActive: true, coeExpiry: { lte: thirtyDaysLater }, ...branchFilter } }),
-      this.prisma.payment.aggregate({ _sum: { amountCents: true }, where: { receivedOn: { gte: startOfMonth }, ...(branchFilter.branchId ? { invoice: { branchId: branchFilter.branchId } } : {}) } }),
-      this.prisma.invoice.aggregate({ _sum: { outstandingCents: true }, where: { status: { notIn: ['PAID', 'CANCELLED', 'WRITTEN_OFF'] }, ...branchFilter } }),
-    ]);
+      const [totalVehicles, availableVehicles, currentlyRented, inMaintenance,
+        returningSoon, paymentsDueToday, overduePayments, upcomingServicing,
+        upcomingInspection, insuranceExpiring, roadTaxExpiring, coeExpiring] = await Promise.all([
+        this.prisma.vehicle.count({ where: { isActive: true, ...branchFilter } }),
+        this.prisma.vehicle.count({ where: { isActive: true, status: 'AVAILABLE', ...branchFilter } }),
+        this.prisma.vehicle.count({ where: { isActive: true, status: 'RENTED_OUT', ...branchFilter } }),
+        this.prisma.vehicle.count({ where: { isActive: true, status: { in: ['MAINTENANCE','CLEANING','INSPECTION','ACCIDENT_REPAIR'] }, ...branchFilter } }),
+        this.prisma.rentalAgreement.count({ where: { status: 'ENDING_SOON', ...branchFilter } }),
+        this.prisma.invoice.count({ where: { status: 'DUE', dueDate: { lte: now }, ...branchFilter } }),
+        this.prisma.invoice.count({ where: { status: 'OVERDUE', ...branchFilter } }),
+        this.prisma.vehicle.count({ where: { isActive: true, nextServiceDate: { lte: thirtyDaysLater }, ...branchFilter } }),
+        this.prisma.vehicle.count({ where: { isActive: true, inspectionDue: { lte: thirtyDaysLater }, ...branchFilter } }),
+        this.prisma.vehicle.count({ where: { isActive: true, insuranceExpiry: { lte: thirtyDaysLater }, ...branchFilter } }),
+        this.prisma.vehicle.count({ where: { isActive: true, roadTaxExpiry: { lte: thirtyDaysLater }, ...branchFilter } }),
+        this.prisma.vehicle.count({ where: { isActive: true, coeExpiry: { lte: thirtyDaysLater }, ...branchFilter } }),
+      ]);
 
-    const monthlyRevenueCents = monthlyRevenue._sum.amountCents ?? BigInt(0);
-    const outstandingCents = outstandingReceivables._sum.outstandingCents ?? BigInt(0);
-    const fleetUtilisationPct = totalVehicles > 0
-      ? Math.round((currentlyRented / totalVehicles) * 100)
-      : 0;
+      // Revenue queries with explicit null handling
+      const revenueAgg = await this.prisma.payment.aggregate({
+        _sum: { amountCents: true },
+        where: { receivedOn: { gte: startOfMonth } },
+      }).catch(() => ({ _sum: { amountCents: null } }));
 
-    return {
-      totalVehicles,
-      availableVehicles,
-      currentlyRented,
-      inMaintenance,
-      returningSoon,
-      paymentsDueToday,
-      overduePayments,
-      upcomingServicing,
-      upcomingInspection,
-      insuranceExpiring,
-      roadTaxExpiring,
-      coeExpiring,
-      monthlyRevenue: { cents: Number(monthlyRevenueCents), display: formatSgd(monthlyRevenueCents) },
-      outstandingReceivables: { cents: Number(outstandingCents), display: formatSgd(outstandingCents) },
-      fleetUtilisationPct,
-    };
+      const receivablesAgg = await this.prisma.invoice.aggregate({
+        _sum: { outstandingCents: true },
+        where: { status: { notIn: ['PAID', 'CANCELLED', 'WRITTEN_OFF'] }, ...branchFilter },
+      }).catch(() => ({ _sum: { outstandingCents: null } }));
+
+      const monthlyRevenueCents = BigInt(revenueAgg._sum?.amountCents ?? 0);
+      const outstandingCents = BigInt(receivablesAgg._sum?.outstandingCents ?? 0);
+      const fleetUtilisationPct = totalVehicles > 0
+        ? Math.round((currentlyRented / totalVehicles) * 100) : 0;
+
+      return {
+        totalVehicles, availableVehicles, currentlyRented, inMaintenance,
+        returningSoon, paymentsDueToday, overduePayments, upcomingServicing,
+        upcomingInspection, insuranceExpiring, roadTaxExpiring, coeExpiring,
+        monthlyRevenue: { cents: Number(monthlyRevenueCents), display: formatSgd(monthlyRevenueCents) },
+        outstandingReceivables: { cents: Number(outstandingCents), display: formatSgd(outstandingCents) },
+        fleetUtilisationPct,
+      };
+    } catch (err) {
+      this.logger?.error('fleetOverview error', err);
+      // Return zeros on error to avoid breaking the dashboard
+      const zero = { cents: 0, display: 'S$0.00' };
+      return {
+        totalVehicles: 0, availableVehicles: 0, currentlyRented: 0, inMaintenance: 0,
+        returningSoon: 0, paymentsDueToday: 0, overduePayments: 0, upcomingServicing: 0,
+        upcomingInspection: 0, insuranceExpiring: 0, roadTaxExpiring: 0, coeExpiring: 0,
+        monthlyRevenue: zero, outstandingReceivables: zero, fleetUtilisationPct: 0,
+      };
+    }
   }
 }
