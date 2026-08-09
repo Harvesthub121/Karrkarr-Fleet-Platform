@@ -180,6 +180,7 @@ export function Sidebar() {
         {canWriteRentals && (
           <Link
             href="/rental-agreement"
+            prefetch={false}
             className={cn(
               'flex items-center gap-2.5 px-4 py-2 text-xs font-medium transition-colors',
               isActive('/rental-agreement')
@@ -196,6 +197,7 @@ export function Sidebar() {
         {canReadVehicles && (
           <Link
             href="/vehicle-handover"
+            prefetch={false}
             className={cn(
               'flex items-center gap-2.5 px-4 py-2 text-xs font-medium transition-colors',
               isActive('/vehicle-handover')
