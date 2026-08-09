@@ -68,7 +68,7 @@ export class ReportsController {
   @ApiOperation({ summary: 'Fleet overview stats for admin dashboard' })
   @RequirePermissions(PERMISSIONS.REPORT_READ)
   async fleetOverview(@Query('branchId') branchId?: string) {
-    return this.service.fleetOverview(branchId);
+    return this.reports.fleetOverview(branchId);
   }
 
 
