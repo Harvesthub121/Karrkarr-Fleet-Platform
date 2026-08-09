@@ -157,38 +157,8 @@ export function Sidebar() {
         ))}
 
         {/* Rental Agreement — shown only when user has rental write permission */}
-        {canWriteRentals && (
-          <Link
-            href="/rental-agreement"
-            prefetch={false}
-            className={cn(
-              'flex items-center gap-2.5 px-4 py-2 text-xs font-medium transition-colors',
-              isActive('/rental-agreement')
-                ? 'bg-teal-500/10 text-teal-400 border-r-2 border-teal-500'
-                : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800',
-            )}
-          >
-            {RentalAgreementIcon}
-            Rental Agreement
-          </Link>
-        )}
 
         {/* Vehicle Handover — shown only when user has vehicles read permission */}
-        {canReadVehicles && (
-          <Link
-            href="/vehicle-handover"
-            prefetch={false}
-            className={cn(
-              'flex items-center gap-2.5 px-4 py-2 text-xs font-medium transition-colors',
-              isActive('/vehicle-handover')
-                ? 'bg-teal-500/10 text-teal-400 border-r-2 border-teal-500'
-                : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800',
-            )}
-          >
-            {VehicleHandoverIcon}
-            Vehicle Handover
-          </Link>
-        )}
       </nav>
 
       {/* User footer */}
