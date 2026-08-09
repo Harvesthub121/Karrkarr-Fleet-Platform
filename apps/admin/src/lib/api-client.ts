@@ -70,17 +70,17 @@ export async function apiFetch<T>(
   retry = true,
 ): Promise<T> {
   const session = getSession();
-  const authHeader = session?.accessToken
-    ? { Authorization: `Bearer ${session.accessToken}` }
-    : {};
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (session?.accessToken) {
+    headers['Authorization'] = `Bearer ${session.accessToken}`;
+  }
+  if (init.headers) {
+    Object.assign(headers, init.headers);
+  }
 
   const res = await fetch(`${API_BASE}${path}`, {
     ...init,
-    headers: {
-      'Content-Type': 'application/json',
-      ...authHeader,
-      ...(init.headers ?? {}),
-    },
+    headers,
   });
 
   if (res.status === 401 && retry) {
