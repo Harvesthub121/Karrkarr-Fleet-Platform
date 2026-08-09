@@ -1,3 +1,4 @@
+import * as bcrypt from 'bcrypt';
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuthService } from '../auth/auth.service';
@@ -133,4 +134,13 @@ export class CustomersService {
       data: { isActive: false },
     });
   }
+  async setPassword(id: string, password: string) {
+    const hash = await bcrypt.hash(password, 10);
+    await this.prisma.customer.update({
+      where: { id },
+      data: { passwordHash: hash, isActive: true, activatedAt: new Date() },
+    });
+    return { message: 'Password updated successfully' };
+  }
+
 }
