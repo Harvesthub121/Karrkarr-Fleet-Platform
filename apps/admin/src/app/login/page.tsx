@@ -35,7 +35,7 @@ function LoginForm() {
       // The API sets httpOnly cookies; store a flag for middleware
       document.cookie = 'karrkarr_authed=1; path=/; SameSite=Lax';
       // Persist user role for client-side permission gating
-      sessionStorage.setItem('karrkarr_admin_session', JSON.stringify(res.admin));
+      sessionStorage.setItem('karrkarr_admin_session', JSON.stringify({ ...res.admin, accessToken: res.tokens.accessToken, refreshToken: res.tokens.refreshToken }));
 
       // Role-aware redirect
       const admin = res.admin;
