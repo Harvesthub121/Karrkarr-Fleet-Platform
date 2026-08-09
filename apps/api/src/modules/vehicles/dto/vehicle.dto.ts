@@ -189,4 +189,15 @@ export class VehicleFilterDto {
   @IsInt()
   @Min(1)
   roadTaxExpiringWithinDays?: number;
+
+  @ApiPropertyOptional({ description: 'Search by plate number, make, or model' })
+  @IsOptional()
+  @IsString()
+  search?: string;
+
+  @ApiPropertyOptional({ description: 'Filter vehicles with any document expiring within 30 days', type: Boolean })
+  @IsOptional()
+  @Type(() => Boolean)
+  @IsBoolean()
+  expirySoon?: boolean;
 }
