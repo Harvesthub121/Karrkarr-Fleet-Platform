@@ -229,7 +229,7 @@ export default function PaymentsPage() {
                       </Can>
                     )}
 
-                    {sub.status !== 'PENDING' && (
+                    {sub.status !== 'PENDING_VERIFICATION' && (
                       <span className={cn(
                         'text-2xs font-medium px-1.5 py-0.5 rounded border',
                         sub.status === 'APPROVED'
