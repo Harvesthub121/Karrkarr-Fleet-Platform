@@ -16,11 +16,20 @@ export class RentalsService {
     private readonly statusMachine: VehicleStatusMachineService,
   ) {}
 
-  async findAll(pagination: PaginationDto, branchId?: string, status?: RentalStatus) {
-    const where = {
+  async findAll(pagination: PaginationDto, branchId?: string, status?: RentalStatus, search?: string) {
+    const where: any = {
       ...(branchId && { branchId }),
       ...(status && { status }),
     };
+    if (search) {
+      const s = search.trim();
+      where.OR = [
+        { customer: { fullName: { contains: s, mode: 'insensitive' } } },
+        { customer: { customerRef: { contains: s, mode: 'insensitive' } } },
+        { vehicle: { plateNumber: { contains: s, mode: 'insensitive' } } },
+        { agreementNo: { contains: s, mode: 'insensitive' } },
+      ];
+    }
     const [items, total] = await Promise.all([
       this.prisma.rentalAgreement.findMany({
         where,
