@@ -27,8 +27,9 @@ export class RentalsController {
     @Query() pagination: PaginationDto,
     @Query('branchId') branchId?: string,
     @Query('status') status?: RentalStatus,
+    @Query('search') search?: string,
   ) {
-    return this.service.findAll(pagination, branchId, status);
+    return this.service.findAll(pagination, branchId, status, search);
   }
 
   @Get(':id')
