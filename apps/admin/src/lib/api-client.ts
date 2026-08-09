@@ -1,14 +1,12 @@
 /**
- * Typed fetch wrapper with automatic JWT refresh on 401.
- * Access token is read from sessionStorage (karrkarr_admin_session) and
- * attached as Authorization: Bearer header on every request.
+ * Typed fetch wrapper for the Karrkarr admin portal.
+ * Reads JWT from sessionStorage and attaches as Authorization header.
  */
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000';
-
 const SESSION_KEY = 'karrkarr_admin_session';
 
-class ApiError extends Error {
+export class ApiError extends Error {
   constructor(
     public status: number,
     public body: unknown,
@@ -19,94 +17,45 @@ class ApiError extends Error {
   }
 }
 
-function getSession(): { accessToken: string; refreshToken: string } | null {
+function getToken(): string | null {
   if (typeof window === 'undefined') return null;
   try {
     const raw = sessionStorage.getItem(SESSION_KEY);
-    return raw ? JSON.parse(raw) : null;
+    if (!raw) return null;
+    const data = JSON.parse(raw);
+    return data?.accessToken ?? null;
   } catch {
     return null;
-  }
-}
-
-function setSession(data: { accessToken: string; refreshToken: string }) {
-  if (typeof window === 'undefined') return;
-  const existing = getSession();
-  sessionStorage.setItem(SESSION_KEY, JSON.stringify({ ...existing, ...data }));
-}
-
-function clearSession() {
-  if (typeof window === 'undefined') return;
-  sessionStorage.removeItem(SESSION_KEY);
-}
-
-let refreshPromise: Promise<boolean> | null = null;
-
-async function refreshTokens(): Promise<boolean> {
-  try {
-    const session = getSession();
-    if (!session?.refreshToken) return false;
-    const res = await fetch(`${API_BASE}/auth/admin/refresh`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refreshToken: session.refreshToken }),
-    });
-    if (!res.ok) return false;
-    const data = await res.json();
-    const tokens = data.tokens ?? data;
-    if (tokens.accessToken) {
-      setSession({ accessToken: tokens.accessToken, refreshToken: tokens.refreshToken ?? session.refreshToken });
-      return true;
-    }
-    return false;
-  } catch {
-    return false;
   }
 }
 
 export async function apiFetch<T>(
   path: string,
   init: RequestInit = {},
-  retry = true,
+  _retry = true,
 ): Promise<T> {
-  const session = getSession();
-  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-  if (session?.accessToken) {
-    headers['Authorization'] = `Bearer ${session.accessToken}`;
-  }
-  if (init.headers) {
-    Object.assign(headers, init.headers);
-  }
+  const token = getToken();
+  const baseHeaders: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (token) baseHeaders['Authorization'] = `Bearer ${token}`;
 
   const res = await fetch(`${API_BASE}${path}`, {
     ...init,
-    headers,
+    headers: { ...baseHeaders, ...(init.headers as Record<string, string> ?? {}) },
   });
 
-  if (res.status === 401 && retry) {
-    if (!refreshPromise) {
-      refreshPromise = refreshTokens().finally(() => {
-        refreshPromise = null;
-      });
-    }
-    const ok = await refreshPromise;
-    if (ok) return apiFetch<T>(path, init, false);
-    // Hard logout
-    clearSession();
-    if (typeof window !== 'undefined') {
-      window.location.href = '/login';
-    }
-    throw new ApiError(401, null, 'Session expired');
-  }
-
   if (!res.ok) {
+    if (res.status === 401 && typeof window !== 'undefined') {
+      // Clear session and redirect to login
+      sessionStorage.removeItem(SESSION_KEY);
+      window.location.href = '/login';
+      throw new ApiError(401, null, 'Session expired');
+    }
     let body: unknown;
     try { body = await res.json(); } catch { body = null; }
     throw new ApiError(res.status, body);
   }
 
   if (res.status === 204) return undefined as T;
-
   return res.json() as Promise<T>;
 }
 
@@ -122,21 +71,13 @@ export function apiGet<T>(path: string, params?: Record<string, string | number 
 }
 
 export function apiPost<T>(path: string, body?: unknown) {
-  return apiFetch<T>(path, {
-    method: 'POST',
-    body: body ? JSON.stringify(body) : undefined,
-  });
+  return apiFetch<T>(path, { method: 'POST', body: body ? JSON.stringify(body) : undefined });
 }
 
 export function apiPatch<T>(path: string, body?: unknown) {
-  return apiFetch<T>(path, {
-    method: 'PATCH',
-    body: body ? JSON.stringify(body) : undefined,
-  });
+  return apiFetch<T>(path, { method: 'PATCH', body: body ? JSON.stringify(body) : undefined });
 }
 
 export function apiDelete<T>(path: string) {
   return apiFetch<T>(path, { method: 'DELETE' });
 }
-
-export { ApiError };
