@@ -215,8 +215,13 @@ async function main() {
         branchId: c.branchId,
         isActive: true,
         activatedAt: new Date(),
+        passwordHash: HASH('Customer@2026!'),
       },
-      update: {},
+      update: {
+        passwordHash: HASH('Customer@2026!'),
+        isActive: true,
+        activatedAt: new Date(),
+      },
     });
     customers[c.ref] = customer.id;
   }
