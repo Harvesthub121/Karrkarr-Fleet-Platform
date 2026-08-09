@@ -64,4 +64,14 @@ export class CustomersController {
   remove(@Param('id') id: string) {
     return this.service.remove(id);
   }
+  @Patch(':id/set-password')
+  @RequirePermissions(PERMISSIONS.CUSTOMER_MANAGE)
+  @ApiOperation({ summary: 'Admin: set or reset a customer password' })
+  async setPassword(
+    @Param('id') id: string,
+    @Body('password') password: string,
+  ) {
+    return this.service.setPassword(id, password);
+  }
+
 }
