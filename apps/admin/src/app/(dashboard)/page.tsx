@@ -46,8 +46,8 @@ export default function OverviewPage() {
   const [branches, setBranches] = useState<{ id: string; name: string }[]>([]);
 
   useEffect(() => {
-    apiGet<{ id: string; name: string }[]>('/branches')
-      .then(setBranches)
+    apiGet<{ data: { id: string; name: string }[]; total: number }>('/branches')
+      .then(res => setBranches(res.data ?? []))
       .catch(() => {});
   }, []);
 
