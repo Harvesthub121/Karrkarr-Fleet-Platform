@@ -54,8 +54,10 @@ async function bootstrap(): Promise<void> {
     new ValidationPipe({
       // Strip unknown properties — prevents parameter pollution
       whitelist: true,
-      // Reject requests that send extra properties rather than silently dropping
-      forbidNonWhitelisted: true,
+      // NOTE: forbidNonWhitelisted is intentionally OFF — many endpoints use
+      // multiple @Query() DTOs (e.g. FilterDto + PaginationDto) that share query
+      // params. With forbidNonWhitelisted each DTO would reject params belonging
+      // to the other. whitelist:true already strips unknown props safely.
       // Transform plain JSON objects into typed DTO instances
       transform: true,
       transformOptions: {
