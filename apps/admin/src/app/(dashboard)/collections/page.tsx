@@ -76,8 +76,45 @@ function AuditTrail({ customerId }: { customerId: string }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    apiGet<AuditEntry[]>(`/collections/customers/${customerId}/audit-trail`)
-      .then(setEntries)
+    interface AuditResponse {
+      ledger: Array<{ id: string; date: string; type: string; amount?: { cents: number; currency: string }; note?: string }>;
+      submissions: Array<{ id: string; submittedAt: string; status: string; declaredAmountCents: number; transactionRef?: string }>;
+      reminders: Array<{ id: string; sentAt: string; channel: string; invoiceNo?: string }>;
+      auditLogs: Array<{ id: string; createdAt: string; action: string; adminName?: string; note?: string }>;
+    }
+    apiGet<AuditResponse>(`/collections/customers/${customerId}/audit-trail`)
+      .then(res => {
+        const entries: AuditEntry[] = [
+          ...(res.ledger ?? []).map(e => ({
+            id: e.id,
+            date: e.date,
+            type: e.type,
+            amount: e.amount,
+            note: e.note,
+          })),
+          ...(res.submissions ?? []).map(e => ({
+            id: e.id,
+            date: e.submittedAt,
+            type: `Payment Submission (${e.status})`,
+            amount: { cents: e.declaredAmountCents, currency: 'SGD' },
+            note: e.transactionRef ? `Ref: ${e.transactionRef}` : undefined,
+          })),
+          ...(res.reminders ?? []).map(e => ({
+            id: e.id,
+            date: e.sentAt,
+            type: `Reminder (${e.channel})`,
+            note: e.invoiceNo ? `Invoice: ${e.invoiceNo}` : undefined,
+          })),
+          ...(res.auditLogs ?? []).map(e => ({
+            id: e.id,
+            date: e.createdAt,
+            type: e.action,
+            note: e.note,
+            by: e.adminName,
+          })),
+        ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        setEntries(entries);
+      })
       .catch(() => setEntries([]))
       .finally(() => setLoading(false));
   }, [customerId]);
